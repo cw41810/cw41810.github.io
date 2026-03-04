@@ -132,6 +132,69 @@
       width:100%; height:100%; object-fit:cover; display:block
     }
 
+    /* Poster section copy (above poster image) */
+    .poster-copy{
+      width:min(80vw, 880px);
+      margin:0 auto;
+      padding-top:10px;
+      padding-bottom:6px;
+    }
+    .poster-tag{
+      margin:0 0 10px;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color: rgba(239,54,97,.95);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .poster-tag::before{
+      content:"";
+      width:30px;
+      height:1px;
+      background: rgba(239,54,97,.85);
+      box-shadow:0 0 14px rgba(239,54,97,.35);
+    }
+    .poster-title{
+      margin:0 0 12px;
+      font-size: clamp(24px, 3.0vw, 44px);
+      letter-spacing:-.6px;
+      line-height:1.15;
+      color: rgba(246,247,251,.95);
+      font-weight:900;
+      word-break: keep-all;
+      line-break: strict;
+    }
+    .poster-desc{
+      margin:0;
+      max-width: 1100px;
+      color: rgba(246,247,251,.72);
+      font-size:14px;
+      line-height:1.8;
+      word-break: keep-all;
+      line-break: strict;
+    }
+    /* Poster (s2) centered image with whitespace */
+    .poster-only{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      padding-top:32px; /* extra top spacing inside the section */
+    }
+    .poster-only .poster-inner{
+      width:min(80vw, 880px); /* ~80% with sensible max for readability */
+    }
+    .poster-only img{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      background: rgba(0,0,0,.20);
+    }
+
     /* reveal animation */
     .reveal{
       opacity:0;
@@ -278,7 +341,7 @@
     .title-overlay{
       position:fixed; inset:0;
       pointer-events:none;
-      display:flex;
+      display:none;
       align-items:flex-start;
       justify-content:center;
       padding-top:90px;
@@ -444,50 +507,52 @@
       section{padding-top:92px}
     }
 
-    /* --- S1 Fullscreen Hero --- */
-section#s1{
-  padding:0;                 /* 기존 72px 패딩 제거 */
-  border-bottom:1px solid var(--line);
-}
+    /* --- S1 Intro: two fullscreen images inside one section --- */
+    section#s1{
+      padding:0;                 /* override global section padding */
+      display:block;             /* override global flex layout */
+      align-items:unset;         /* safety override */
+      min-height:auto;           /* let internal panels define height */
+      border-bottom:1px solid var(--line);
+    }
 
-.hero{
-  position:relative;
-  width:100%;
-  height:100vh;              /* 한 섹션 = 한 화면 */
-  overflow:hidden;
-  background:#000;
-}
+    .snap-panel{
+      height:100vh;
+      scroll-snap-align:start;
+      position:relative;
+    }
 
-/* 실제 이미지를 꽉 채우기 */
-.hero img{
-  width:100%;
-  height:100%;
-  object-fit:cover;          /* 1920x1080을 화면에 꽉 채움(크롭 발생 가능) */
-  display:block;
-  filter: contrast(1.05) saturate(1.05);
-}
+    .hero{
+      position:relative;
+      width:100%;
+      height:100%;               /* fill snap-panel */
+      overflow:hidden;
+      background:#000;
+    }
 
-/* (선택) 분위기용 오버레이 */
-.hero::after{
-  content:"";
-  position:absolute; inset:0;
-  background:
-    radial-gradient(900px 600px at 20% 10%, rgba(0,191,165,.14), transparent 55%),
-    radial-gradient(900px 700px at 90% 40%, rgba(255,255,255,.10), transparent 60%),
-    linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.10), rgba(0,0,0,.45));
-  pointer-events:none;
-}
+    .hero img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter: contrast(1.05) saturate(1.05);
+    }
 
-/* (선택) 상단 네비 아래로 이미지가 너무 가리지 않게 안전 여백이 필요하면 사용
-   - 지금 네비가 투명 그라데이션이라 보통은 없어도 OK
-*/
-.hero-safe{
-  position:absolute;
-  top:0; left:0; right:0;
-  height:80px;
-  background: linear-gradient(to bottom, rgba(0,0,0,.35), transparent);
-  pointer-events:none;
-}
+    /* optional: subtle vignette for readability under nav */
+    .hero::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.10), rgba(0,0,0,.45));
+      pointer-events:none;
+    }
+
+    .hero-safe{
+      position:absolute;
+      top:0; left:0; right:0;
+      height:80px;
+      background: linear-gradient(to bottom, rgba(0,0,0,.35), transparent);
+      pointer-events:none;
+    }
   </style>
 </head>
 <body>
@@ -498,7 +563,7 @@ section#s1{
         <span class="badge">RECORDING</span>
       </div>
       <div class="nav-links">
-        <button class="pill" data-go="s1">1</button>
+        <button class="pill" data-go="s1a">1</button>
         <button class="pill" data-go="s2">2</button>
         <button class="pill" data-go="s3">3</button>
         <button class="pill" data-go="s4">4</button>
@@ -548,28 +613,37 @@ section#s1{
   <main id="scrollRoot">
     <!-- 1 -->
 <section id="s1" data-title="프로젝트 인트로" data-sub="INTRO">
-  <div class="hero">
-    <div class="hero-safe"></div>
-    <img src="images/city_of_eyes_main.jpg" alt="City of Eyes main visual">
+  <!-- Panel 1: Thumbnail (fullscreen) -->
+  <div class="snap-panel" id="s1a">
+    <div class="hero">
+      <div class="hero-safe"></div>
+      <img src="images/city_of_eyes_main.jpg" alt="City of Eyes main visual">
+    </div>
+  </div>
+
+  <!-- Panel 2: Exhibition hall (fullscreen) -->
+  <div class="snap-panel" id="s1b">
+    <div class="hero">
+      <div class="hero-safe"></div>
+      <img src="images/exhibition_hall.png" alt="Exhibition hall visual">
+    </div>
   </div>
 </section>
 
     <!-- 2 -->
     <section id="s2" data-title="포스터 섹션" data-sub="POSTER">
       <div class="container">
-        <div class="kicker reveal">Poster</div>
-        <h1 class="reveal delay1">당신은 이미<br/>감시 환경 안에 있다.</h1>
-        <p class="lead reveal delay2">인포그래픽으로 CCTV 설치 현황과 감시 환경을 ‘정보 인식’ 단계에서 먼저 체감하게 합니다.</p>
-
-        <div class="grid-2" style="margin-top:18px">
-          <div class="card reveal delay2">
-            <h2>인포그래픽 포스터</h2>
-            <div class="media"><img src="images/poster-infographic.jpg" alt="infographic poster"></div>
-          </div>
-          <div class="card reveal delay3">
-            <h2>메시지</h2>
-            <p>감시는 보호를 가장하지만, 동시에 기록과 해석을 수행한다.</p>
-            <p class="muted">이 구간은 ‘정적’ 파트라서 텍스트가 크게 남을수록 웅장해져.</p>
+        <div class="poster-copy">
+          <div class="poster-tag">Poster</div>
+          <h2 class="poster-title">보호라는 이름으로 <br> 우리는 기록된다.</h2>
+          <p class="poster-desc">
+            이 포스터는 ‘보호’와 ‘침해’가 동시에 작동하는 감시의 모순을 보여주며, 
+            <br> 우리가 어디까지 보호받고 어디부터 감시되는지 그 경계에 대해 스스로 질문하게 합니다.
+          </p>
+        </div>
+        <div class="poster-only">
+          <div class="poster-inner">
+            <img src="images/poster.png" alt="Poster" loading="lazy">
           </div>
         </div>
       </div>
@@ -852,7 +926,7 @@ section#s1{
       camOverlay.style.display = "flex";
     }
 
-    /*allowCamBtn.addEventListener("click", async ()=>{
+    allowCamBtn.addEventListener("click", async ()=>{
       // 사용자 제스처 안에서 요청해야 허용창이 뜸
       await requestCamera();
       cameraModal.classList.remove("on");
@@ -862,7 +936,7 @@ section#s1{
     skipCamBtn.addEventListener("click", ()=>{
       cameraModal.classList.remove("on");
       showTitleOverlay("전시 시작", "BEGIN");
-    });*/
+    });
 
     retryCamBtn.addEventListener("click", async ()=>{
       await requestCamera();

@@ -6,7 +6,7 @@
   <title>CCTV Online Exhibition</title>
   <style>
     :root{
-      --teal:#00BFA5;
+      --teal:#EF3661;
       --bg:#0b0c10;
       --fg:#f6f7fb;
       --muted:rgba(246,247,251,.72);
@@ -61,9 +61,9 @@
     .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
     .badge{
       font-size:12px; padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(0,191,165,.35);
-      background:rgba(0,191,165,.10);
-      color:rgba(0,255,221,.95);
+      border:1px solid rgba(239,54,97,.35);
+      background:#030812;
+      color:#EF3661;
       font-weight:700;
     }
     .nav-links{display:flex; gap:8px; flex-wrap:wrap}
@@ -105,8 +105,8 @@
     .kicker::before{
       content:"";
       width:30px; height:1px;
-      background:rgba(0,191,165,.8);
-      box-shadow:0 0 16px rgba(0,191,165,.45);
+      background:#EF3661;
+      box-shadow:0 0 16px rgba(239,54,97,.45);
     }
 
     /* cards / layout */
@@ -443,13 +443,58 @@
       .grid-2, .interaction, .camera-wrap{grid-template-columns:1fr}
       section{padding-top:92px}
     }
+
+    /* --- S1 Fullscreen Hero --- */
+section#s1{
+  padding:0;                 /* 기존 72px 패딩 제거 */
+  border-bottom:1px solid var(--line);
+}
+
+.hero{
+  position:relative;
+  width:100%;
+  height:100vh;              /* 한 섹션 = 한 화면 */
+  overflow:hidden;
+  background:#000;
+}
+
+/* 실제 이미지를 꽉 채우기 */
+.hero img{
+  width:100%;
+  height:100%;
+  object-fit:cover;          /* 1920x1080을 화면에 꽉 채움(크롭 발생 가능) */
+  display:block;
+  filter: contrast(1.05) saturate(1.05);
+}
+
+/* (선택) 분위기용 오버레이 */
+.hero::after{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    radial-gradient(900px 600px at 20% 10%, rgba(0,191,165,.14), transparent 55%),
+    radial-gradient(900px 700px at 90% 40%, rgba(255,255,255,.10), transparent 60%),
+    linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.10), rgba(0,0,0,.45));
+  pointer-events:none;
+}
+
+/* (선택) 상단 네비 아래로 이미지가 너무 가리지 않게 안전 여백이 필요하면 사용
+   - 지금 네비가 투명 그라데이션이라 보통은 없어도 OK
+*/
+.hero-safe{
+  position:absolute;
+  top:0; left:0; right:0;
+  height:80px;
+  background: linear-gradient(to bottom, rgba(0,0,0,.35), transparent);
+  pointer-events:none;
+}
   </style>
 </head>
 <body>
   <div class="nav">
     <div class="nav-inner">
       <div class="brand">
-        <span>CCTV Exhibition</span>
+        <span>City of Eyes</span>
         <span class="badge">RECORDING</span>
       </div>
       <div class="nav-links">
@@ -471,9 +516,6 @@
       <p class="desc">
         전시 체험이 완료되면(기록 5회), 화면은 ‘관람자’로 전환됩니다.<br>
         카메라 영상은 <b>브라우저 안에서만</b> 표시되며, 이 페이지는 업로드/전송 기능을 포함하지 않습니다.
-      </p>
-      <p class="desc" style="font-size:12px; opacity:.8">
-        * 카메라는 보통 <b>https</b> 또는 <b>localhost</b>에서만 정상 동작합니다.
       </p>
       <div class="row">
         <button class="btn" id="skipCamBtn">지금은 건너뛰기</button>
@@ -505,24 +547,12 @@
 
   <main id="scrollRoot">
     <!-- 1 -->
-    <section id="s1" data-title="프로젝트 인트로" data-sub="INTRO">
-      <div class="container">
-        <div class="kicker reveal">Project Intro</div>
-        <h1 class="reveal delay1">감시는 멀리 있지 않다.<br/>당신의 시선이 기록이 된다.</h1>
-        <p class="lead reveal delay2">프로젝트 썸네일과 가상 전시장 이미지로 온라인 전시의 전체 분위기와 맥락을 제시합니다.</p>
-
-        <div class="grid-2" style="margin-top:18px">
-          <div class="card reveal delay2">
-            <h2>프로젝트 썸네일</h2>
-            <div class="media"><img src="images/thumbnail.jpg" alt="project thumbnail"></div>
-          </div>
-          <div class="card reveal delay3">
-            <h2>가상 전시장 이미지</h2>
-            <div class="media"><img src="images/virtual-gallery.jpg" alt="virtual gallery"></div>
-          </div>
-        </div>
-      </div>
-    </section>
+<section id="s1" data-title="프로젝트 인트로" data-sub="INTRO">
+  <div class="hero">
+    <div class="hero-safe"></div>
+    <img src="images/city_of_eyes_main.jpg" alt="City of Eyes main visual">
+  </div>
+</section>
 
     <!-- 2 -->
     <section id="s2" data-title="포스터 섹션" data-sub="POSTER">
@@ -751,7 +781,7 @@
         showTitleOverlay(sec.getAttribute("data-title"), sec.getAttribute("data-sub"));
       });
     }, {threshold: 0.55});
-    $$("section[data-title]").forEach(sec=>sectionIO.observe(sec));
+    /*$$("section[data-title]").forEach(sec=>sectionIO.observe(sec));*/
 
     // flash
     const flashEl = $("#flash");
@@ -822,7 +852,7 @@
       camOverlay.style.display = "flex";
     }
 
-    allowCamBtn.addEventListener("click", async ()=>{
+    /*allowCamBtn.addEventListener("click", async ()=>{
       // 사용자 제스처 안에서 요청해야 허용창이 뜸
       await requestCamera();
       cameraModal.classList.remove("on");
@@ -832,7 +862,7 @@
     skipCamBtn.addEventListener("click", ()=>{
       cameraModal.classList.remove("on");
       showTitleOverlay("전시 시작", "BEGIN");
-    });
+    });*/
 
     retryCamBtn.addEventListener("click", async ()=>{
       await requestCamera();

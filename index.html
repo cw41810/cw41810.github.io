@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CCTV Online Exhibition</title>
+  <style>
+    :root{
+      --teal:#00BFA5;
+      --bg:#0b0c10;
+      --fg:#f6f7fb;
+      --muted:rgba(246,247,251,.72);
+      --line:rgba(255,255,255,.12);
+      --card:rgba(255,255,255,.06);
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR";
+      background: radial-gradient(1200px 700px at 20% 10%, rgba(0,191,165,.15), transparent 55%),
+                  radial-gradient(900px 600px at 90% 30%, rgba(255,255,255,.08), transparent 60%),
+                  var(--bg);
+      color:var(--fg);
+      overflow-x:hidden;
+    }
+
+    /* fullpage snap */
+    main{
+      height:100vh;
+      overflow-y:auto;
+      scroll-snap-type:y mandatory;
+      scroll-behavior:smooth;
+    }
+    section{
+      min-height:100vh;
+      scroll-snap-align:start;
+      display:flex;
+      align-items:center;
+      border-bottom:1px solid var(--line);
+      position:relative;
+      padding:72px 16px;
+    }
+    .container{max-width:1100px; margin:0 auto; width:100%}
+
+    /* top nav */
+    .nav{
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      background: linear-gradient(to bottom, rgba(11,12,16,.88), rgba(11,12,16,.35), transparent);
+      padding:14px 16px 10px;
+      pointer-events:none;
+    }
+    .nav-inner{
+      max-width:1100px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      pointer-events:auto;
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+    .badge{
+      font-size:12px; padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(0,191,165,.35);
+      background:rgba(0,191,165,.10);
+      color:rgba(0,255,221,.95);
+      font-weight:700;
+    }
+    .nav-links{display:flex; gap:8px; flex-wrap:wrap}
+    .pill{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:rgba(246,247,251,.9);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      transition:transform .15s ease, background .15s ease;
+    }
+    .pill:hover{background:rgba(255,255,255,.10); transform:translateY(-1px)}
+
+    /* typography */
+    h1{
+      margin:0 0 12px;
+      font-size: clamp(34px, 3.4vw, 54px);
+      letter-spacing:-.8px;
+      line-height:1.08;
+    }
+    h2{
+      margin:0 0 10px;
+      font-size: 18px;
+      letter-spacing:-.2px;
+      color:rgba(246,247,251,.92);
+    }
+    p{margin:0 0 12px; color:var(--muted)}
+    .lead{font-size: clamp(14px, 1.5vw, 18px); color:rgba(246,247,251,.78)}
+    .kicker{
+      display:inline-flex; align-items:center; gap:10px;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(246,247,251,.6);
+      margin-bottom:12px;
+    }
+    .kicker::before{
+      content:"";
+      width:30px; height:1px;
+      background:rgba(0,191,165,.8);
+      box-shadow:0 0 16px rgba(0,191,165,.45);
+    }
+
+    /* cards / layout */
+    .grid-2{display:grid; grid-template-columns:1.1fr .9fr; gap:16px}
+    .card{
+      border:1px solid rgba(255,255,255,.12);
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .media{
+      width:100%;
+      aspect-ratio:16/9;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      position:relative;
+    }
+    .media img,.media video{
+      width:100%; height:100%; object-fit:cover; display:block
+    }
+
+    /* reveal animation */
+    .reveal{
+      opacity:0;
+      transform: translateY(18px);
+      transition: opacity .8s ease, transform .8s ease;
+    }
+    .reveal.on{opacity:1; transform: translateY(0)}
+    .reveal.delay1{transition-delay:.10s}
+    .reveal.delay2{transition-delay:.22s}
+    .reveal.delay3{transition-delay:.34s}
+
+    /* Interaction */
+    .interaction{display:grid; grid-template-columns:1.2fr .8fr; gap:16px; align-items:start}
+    .cctv-grid{
+      width:100%;
+      aspect-ratio:16/9;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      grid-template-rows:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .quad{
+      position:relative;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.05);
+      cursor:pointer;
+      user-select:none;
+      transition: transform .18s ease, border-color .18s ease, filter .18s ease;
+    }
+    .quad video{
+      width:100%; height:100%; object-fit:cover; display:block;
+      filter:contrast(1.05) saturate(1.1);
+      transform:scale(1.02);
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .quad:hover{transform:translateY(-2px); border-color:rgba(0,191,165,.45)}
+    .quad:hover video{transform:scale(1.05)}
+    .quad .label{
+      position:absolute; left:10px; top:10px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.10);
+      color:#fff; font-size:12px;
+    }
+    .quad .hint{
+      position:absolute; right:10px; bottom:10px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.88);
+      color:#111;
+      border:1px solid rgba(0,0,0,.10);
+      font-size:12px;
+    }
+    .quad.selected{
+      outline:3px solid var(--teal);
+      outline-offset:0;
+      box-shadow:0 0 0 1px rgba(0,191,165,.35), 0 0 40px rgba(0,191,165,.18);
+    }
+
+    /* camera switch effect triggered with sound */
+    .quad.switching{
+      transform:translateY(-2px) scale(1.02);
+      filter: brightness(1.08) contrast(1.15);
+      border-color: rgba(0,191,165,.65);
+    }
+    .quad.switching video{
+      transform:scale(1.10);
+      filter: contrast(1.25) saturate(1.35);
+    }
+    @keyframes glitch {
+      0%{clip-path: inset(0 0 0 0)}
+      20%{clip-path: inset(8% 0 0 0)}
+      40%{clip-path: inset(0 0 10% 0)}
+      60%{clip-path: inset(12% 0 0 0)}
+      80%{clip-path: inset(0 0 6% 0)}
+      100%{clip-path: inset(0 0 0 0)}
+    }
+    .quad.switching::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(90deg, rgba(0,191,165,.18), transparent 45%, rgba(255,255,255,.12));
+      mix-blend-mode: screen;
+      animation: glitch .18s linear 1;
+      pointer-events:none;
+    }
+
+    .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .btn{
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.06);
+      color:rgba(246,247,251,.92);
+      padding:9px 11px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:13px;
+    }
+    .btn:hover{background:rgba(255,255,255,.10)}
+    .btn-danger{
+      border-color: rgba(255,120,120,.35);
+      background: rgba(255,120,120,.10);
+      color: rgba(255,180,180,.95);
+    }
+
+    .log{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:rgba(255,255,255,.06);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .log-head{
+      padding:12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .log-count{
+      font-size:12px; padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.25);
+      color:rgba(246,247,251,.92);
+      font-weight:700;
+    }
+    .log-list{max-height:380px; overflow:auto}
+    .log-item{
+      padding:10px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      align-items:center;
+    }
+    .log-title{margin:0; font-size:13px; color:rgba(246,247,251,.95)}
+    .log-meta{margin:0; font-size:12px; color:rgba(246,247,251,.62)}
+
+    /* overlay title (section) */
+    .title-overlay{
+      position:fixed; inset:0;
+      pointer-events:none;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding-top:90px;
+      z-index:120;
+      opacity:0;
+      transform: translateY(10px);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .title-overlay.on{opacity:1; transform: translateY(0)}
+    .title-overlay .box{
+      max-width:1100px;
+      width:calc(100% - 32px);
+      display:flex;
+      justify-content:flex-start;
+    }
+    .title-overlay .title{
+      font-size: clamp(28px, 4.2vw, 64px);
+      letter-spacing:-1px;
+      line-height:1.05;
+      font-weight:900;
+      color:rgba(246,247,251,.92);
+      text-shadow: 0 20px 70px rgba(0,0,0,.55);
+    }
+    .title-overlay .sub{
+      margin-top:8px;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(246,247,251,.55);
+      display:flex; align-items:center; gap:10px;
+    }
+    .title-overlay .sub::before{
+      content:"";
+      width:34px; height:1px;
+      background:rgba(0,191,165,.85);
+      box-shadow:0 0 18px rgba(0,191,165,.45);
+    }
+
+    /* flash (0.1s) */
+    .flash{
+      position:fixed; inset:0;
+      background:white;
+      opacity:0;
+      pointer-events:none;
+      z-index:200;
+    }
+    .flash.on{ animation: flash .10s linear 1; }
+    @keyframes flash{
+      0%{opacity:0}
+      15%{opacity:1}
+      100%{opacity:0}
+    }
+
+    /* completion overlay */
+    .complete-overlay{
+      position:fixed; inset:0;
+      pointer-events:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:180;
+      opacity:0;
+      transition: opacity .35s ease;
+      background: radial-gradient(700px 400px at 50% 40%, rgba(0,191,165,.20), transparent 60%),
+                  rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+    }
+    .complete-overlay.on{opacity:1}
+    .complete-overlay .panel{
+      width:min(840px, calc(100% - 32px));
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      border-radius:22px;
+      padding:22px 18px;
+      box-shadow: var(--shadow);
+    }
+    .complete-overlay .big{
+      margin:0;
+      font-size: clamp(22px, 3.2vw, 40px);
+      font-weight:900;
+      letter-spacing:-.8px;
+      line-height:1.15;
+    }
+    .complete-overlay .small{
+      margin:10px 0 0;
+      color:rgba(246,247,251,.72);
+    }
+
+    /* Camera consent modal */
+    .modal{
+      position:fixed; inset:0;
+      z-index:220;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(6px);
+    }
+    .modal.on{display:flex}
+    .modal .panel{
+      width:min(820px, calc(100% - 32px));
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      border-radius:22px;
+      padding:20px 18px;
+      box-shadow: var(--shadow);
+    }
+    .modal .title{
+      margin:0 0 8px;
+      font-size: clamp(18px, 2.2vw, 28px);
+      font-weight:900;
+      letter-spacing:-.6px;
+    }
+    .modal .desc{margin:0 0 14px; color:rgba(246,247,251,.75)}
+    .modal .row{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+      margin-top:12px;
+    }
+    .modal .btn{
+      padding:10px 12px;
+      border-radius:14px;
+    }
+    .btn-primary{
+      border-color: rgba(0,191,165,.55);
+      background: rgba(0,191,165,.18);
+      color: rgba(0,255,221,.95);
+      font-weight:800;
+    }
+
+    /* Camera view inside outro */
+    .camera-wrap{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:16px;
+      margin-top:18px;
+    }
+    .camera-note{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .camera-state{
+      font-size:12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:rgba(246,247,251,.55);
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:10px;
+    }
+    .camera-state::before{
+      content:"";
+      width:34px; height:1px;
+      background:rgba(0,191,165,.85);
+      box-shadow:0 0 18px rgba(0,191,165,.45);
+    }
+
+    @media (max-width: 900px){
+      .grid-2, .interaction, .camera-wrap{grid-template-columns:1fr}
+      section{padding-top:92px}
+    }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <span>CCTV Exhibition</span>
+        <span class="badge">RECORDING</span>
+      </div>
+      <div class="nav-links">
+        <button class="pill" data-go="s1">1</button>
+        <button class="pill" data-go="s2">2</button>
+        <button class="pill" data-go="s3">3</button>
+        <button class="pill" data-go="s4">4</button>
+        <button class="pill" data-go="s5">5</button>
+        <button class="pill" data-go="s6">6</button>
+        <button class="pill" data-go="s7">7</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera consent modal -->
+  <div class="modal on" id="cameraModal" aria-modal="true" role="dialog">
+    <div class="panel">
+      <p class="title">카메라 사용을 허용하시겠습니까?</p>
+      <p class="desc">
+        전시 체험이 완료되면(기록 5회), 화면은 ‘관람자’로 전환됩니다.<br>
+        카메라 영상은 <b>브라우저 안에서만</b> 표시되며, 이 페이지는 업로드/전송 기능을 포함하지 않습니다.
+      </p>
+      <p class="desc" style="font-size:12px; opacity:.8">
+        * 카메라는 보통 <b>https</b> 또는 <b>localhost</b>에서만 정상 동작합니다.
+      </p>
+      <div class="row">
+        <button class="btn" id="skipCamBtn">지금은 건너뛰기</button>
+        <button class="btn btn-primary" id="allowCamBtn">허용하고 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section title overlay -->
+  <div class="title-overlay" id="titleOverlay">
+    <div class="box">
+      <div>
+        <div class="title" id="titleText">—</div>
+        <div class="sub" id="titleSub">SECTION</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flash -->
+  <div class="flash" id="flash"></div>
+
+  <!-- Completion overlay -->
+  <div class="complete-overlay" id="completeOverlay">
+    <div class="panel">
+      <p class="big">당신도 감시당하는 존재입니다.<br>기록이 완료되었습니다.</p>
+      <p class="small">대상은 ‘타인’에서 ‘나 자신’으로 전환됩니다.</p>
+    </div>
+  </div>
+
+  <main id="scrollRoot">
+    <!-- 1 -->
+    <section id="s1" data-title="프로젝트 인트로" data-sub="INTRO">
+      <div class="container">
+        <div class="kicker reveal">Project Intro</div>
+        <h1 class="reveal delay1">감시는 멀리 있지 않다.<br/>당신의 시선이 기록이 된다.</h1>
+        <p class="lead reveal delay2">프로젝트 썸네일과 가상 전시장 이미지로 온라인 전시의 전체 분위기와 맥락을 제시합니다.</p>
+
+        <div class="grid-2" style="margin-top:18px">
+          <div class="card reveal delay2">
+            <h2>프로젝트 썸네일</h2>
+            <div class="media"><img src="images/thumbnail.jpg" alt="project thumbnail"></div>
+          </div>
+          <div class="card reveal delay3">
+            <h2>가상 전시장 이미지</h2>
+            <div class="media"><img src="images/virtual-gallery.jpg" alt="virtual gallery"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2" data-title="포스터 섹션" data-sub="POSTER">
+      <div class="container">
+        <div class="kicker reveal">Poster</div>
+        <h1 class="reveal delay1">당신은 이미<br/>감시 환경 안에 있다.</h1>
+        <p class="lead reveal delay2">인포그래픽으로 CCTV 설치 현황과 감시 환경을 ‘정보 인식’ 단계에서 먼저 체감하게 합니다.</p>
+
+        <div class="grid-2" style="margin-top:18px">
+          <div class="card reveal delay2">
+            <h2>인포그래픽 포스터</h2>
+            <div class="media"><img src="images/poster-infographic.jpg" alt="infographic poster"></div>
+          </div>
+          <div class="card reveal delay3">
+            <h2>메시지</h2>
+            <p>감시는 보호를 가장하지만, 동시에 기록과 해석을 수행한다.</p>
+            <p class="muted">이 구간은 ‘정적’ 파트라서 텍스트가 크게 남을수록 웅장해져.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3" data-title="인터랙션 인트로" data-sub="WORLD-BUILDING">
+      <div class="container">
+        <div class="kicker reveal">Interaction Intro</div>
+        <h1 class="reveal delay1">미래 사회에서 감시는<br/>정상(정상처럼) 작동한다.</h1>
+        <p class="lead reveal delay2">AI 기반 서사 영상으로 “확장된 감시”의 세계관을 제시합니다.</p>
+        <div class="card reveal delay3" style="margin-top:18px">
+          <div class="media"><video src="videos/interaction_intro.mp4" controls></video></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4" data-title="인터랙션 규칙 안내" data-sub="RULES">
+      <div class="container">
+        <div class="kicker reveal">Rules</div>
+        <h1 class="reveal delay1">이제 당신은 감시자다.</h1>
+        <p class="lead reveal delay2">클릭은 선택이 아니라 ‘기록’이 된다. 당신의 판단이 로그로 남는다.</p>
+
+        <div class="grid-2" style="margin-top:18px">
+          <div class="card reveal delay2">
+            <h2>규칙</h2>
+            <ul style="margin:0;padding-left:18px;color:rgba(246,247,251,.85)">
+              <li>4분할 CCTV 화면에서 장면을 클릭하세요.</li>
+              <li>클릭한 <b>구역</b>과 <b>시간</b>이 ‘감시 로그’로 저장됩니다.</li>
+              <li>기록이 누적될수록, 시선은 타인에서 ‘나 자신’으로 전환됩니다.</li>
+            </ul>
+          </div>
+          <div class="card reveal delay3">
+            <h2>연출</h2>
+            <p>실제 인터랙션은 화면 녹화 영상으로 대체하지만, 클릭/로그는 실시간 반영됩니다.</p>
+            <p class="muted">→ “내가 눌렀다”는 행위성 유지가 핵심.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5" data-title="인터랙션 체험" data-sub="EXPERIENCE">
+      <div class="container">
+        <div class="kicker reveal">Experience</div>
+        <h1 class="reveal delay1">포착하라.<br/>그리고 기록하라.</h1>
+        <p class="lead reveal delay2">클릭 시: 찰칵/비프 + 플래시 + 카메라 전환. 로그 5개면 ‘관람자’로 전환.</p>
+
+        <div class="interaction" style="margin-top:18px">
+          <div class="card reveal delay2">
+            <h2>CCTV 4분할 (클릭)</h2>
+
+            <div class="cctv-grid" id="cctvGrid">
+              <div class="quad" data-q="TL" title="클릭하여 포착">
+                <video src="videos/cctv_TL.mp4" muted autoplay loop playsinline></video>
+                <div class="label">좌상단</div><div class="hint">클릭</div>
+              </div>
+              <div class="quad" data-q="TR" title="클릭하여 포착">
+                <video src="videos/cctv_TR.mp4" muted autoplay loop playsinline></video>
+                <div class="label">우상단</div><div class="hint">클릭</div>
+              </div>
+              <div class="quad" data-q="BL" title="클릭하여 포착">
+                <video src="videos/cctv_BL.mp4" muted autoplay loop playsinline></video>
+                <div class="label">좌하단</div><div class="hint">클릭</div>
+              </div>
+              <div class="quad" data-q="BR" title="클릭하여 포착">
+                <video src="videos/cctv_BR.mp4" muted autoplay loop playsinline></video>
+                <div class="label">우하단</div><div class="hint">클릭</div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px">
+              <h2 style="margin-top:0">감시 로그 영상(대체 체험)</h2>
+              <p class="muted">* 누적 로그에 따라 화면녹화 영상이 바뀌게 할 수 있음(샘플 규칙).</p>
+              <div class="media"><video id="logVideo" src="videos/log_default.mp4" controls></video></div>
+
+              <div class="row">
+                <button class="btn btn-danger" id="clearLogsBtn">로그 초기화</button>
+                <button class="btn" id="exportLogsBtn">로그 JSON 내보내기</button>
+              </div>
+
+              <p class="muted" style="font-size:12px;margin-top:10px">
+                * 오디오 파일: <code>audio/shutter.mp3</code>, <code>audio/beep.mp3</code> (없으면 무음)
+              </p>
+            </div>
+          </div>
+
+          <div class="log reveal delay3">
+            <div class="log-head">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <div style="font-weight:900;letter-spacing:.2px">감시 로그</div>
+                <div class="muted" style="font-size:12px">클릭한 구역/시간이 기록됩니다.</div>
+              </div>
+              <div class="log-count" id="logCount">0</div>
+            </div>
+            <div class="log-list" id="logList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6" data-title="아웃트로" data-sub="OUTRO">
+      <div class="container">
+        <div class="kicker reveal">Outro</div>
+        <h1 class="reveal delay1">당신도 감시당하는 존재입니다.<br/>기록이 완료되었습니다.</h1>
+        <p class="lead reveal delay2">아래는 ‘관람자(당신)’ 화면입니다.</p>
+
+        <div class="camera-wrap">
+          <div class="card reveal delay3">
+            <div class="camera-state">LIVE CAMERA FEED</div>
+            <div class="media">
+              <!-- 사용자 카메라 -->
+              <video id="userCam" autoplay playsinline muted></video>
+              <!-- 상태 오버레이 -->
+              <div id="camOverlay" style="
+                position:absolute; inset:0;
+                display:flex; align-items:center; justify-content:center;
+                background:rgba(0,0,0,.45);
+                color:rgba(246,247,251,.9);
+                text-align:center;
+                padding:16px;
+                font-weight:800;
+                letter-spacing:-.3px;
+              ">
+                <div>
+                  <div style="font-size:18px; margin-bottom:6px">카메라가 준비되지 않았습니다</div>
+                  <div style="font-size:13px; color:rgba(246,247,251,.70); font-weight:600">
+                    상단 시작 모달에서 “허용하고 시작”을 눌러주세요.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <button class="btn" id="retryCamBtn">카메라 다시 요청</button>
+              <button class="btn btn-danger" id="stopCamBtn">카메라 끄기</button>
+            </div>
+          </div>
+
+          <div class="camera-note reveal delay3">
+            <h2>메시지</h2>
+            <p>당신의 선택은 기록이 되었고, 그 시선은 결국 당신에게 돌아옵니다.</p>
+            <p class="muted" style="font-size:12px">
+              * 이 카메라 화면은 브라우저에서만 표시됩니다. 업로드/전송 기능은 포함하지 않습니다.
+            </p>
+
+            <h2 style="margin-top:16px">아웃트로 영상(옵션)</h2>
+            <p class="muted">카메라 대신 영상으로 마무리하고 싶다면 아래를 사용하세요.</p>
+            <div class="media" style="margin-top:10px">
+              <video src="videos/outro_message.mp4" controls></video>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7" data-title="전체 플로우 요약" data-sub="SUMMARY">
+      <div class="container">
+        <div class="kicker reveal">Summary</div>
+        <h1 class="reveal delay1">전시 전체 플로우 요약</h1>
+        <p class="lead reveal delay2">전시 경험을 한 번에 보여주는 요약 영상으로 마무리.</p>
+        <div class="card reveal delay3" style="margin-top:18px">
+          <div class="media"><video src="videos/summary.mp4" controls></video></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    // nav scroll
+    $$("[data-go]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id = btn.getAttribute("data-go");
+        const el = document.getElementById(id);
+        if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+      });
+    });
+
+    // reveal on view
+    const revealIO = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting) e.target.classList.add("on");
+      });
+    }, {threshold: 0.18});
+    $$(".reveal").forEach(el=>revealIO.observe(el));
+
+    // section title overlay
+    const titleOverlay = $("#titleOverlay");
+    const titleText = $("#titleText");
+    const titleSub  = $("#titleSub");
+    let titleTimer = null;
+    function showTitleOverlay(title, sub){
+      titleText.textContent = title || "";
+      titleSub.textContent = sub || "SECTION";
+      titleOverlay.classList.add("on");
+      clearTimeout(titleTimer);
+      titleTimer = setTimeout(()=> titleOverlay.classList.remove("on"), 900);
+    }
+    const sectionIO = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(!e.isIntersecting) return;
+        const sec = e.target;
+        showTitleOverlay(sec.getAttribute("data-title"), sec.getAttribute("data-sub"));
+      });
+    }, {threshold: 0.55});
+    $$("section[data-title]").forEach(sec=>sectionIO.observe(sec));
+
+    // flash
+    const flashEl = $("#flash");
+    function flash(){
+      flashEl.classList.remove("on");
+      void flashEl.offsetWidth;
+      flashEl.classList.add("on");
+    }
+
+    // audio
+    const shutterAudio = new Audio("audio/shutter.mp3");
+    const beepAudio    = new Audio("audio/beep.mp3");
+    shutterAudio.preload = "auto";
+    beepAudio.preload = "auto";
+    function playSound(aud){
+      try{
+        aud.currentTime = 0;
+        const p = aud.play();
+        if(p && typeof p.catch === "function") p.catch(()=>{});
+      }catch(e){}
+    }
+
+    // ---- Camera permission + stream ----
+    const cameraModal = $("#cameraModal");
+    const allowCamBtn = $("#allowCamBtn");
+    const skipCamBtn  = $("#skipCamBtn");
+    const retryCamBtn = $("#retryCamBtn");
+    const stopCamBtn  = $("#stopCamBtn");
+    const userCamEl   = $("#userCam");
+    const camOverlay  = $("#camOverlay");
+
+    let camStream = null;
+    let camReady = false;
+
+    async function requestCamera(){
+      // NOTE: https/localhost 권장
+      try{
+        // 기존 스트림 정리
+        stopCamera();
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" }, // 전면
+          audio: false
+        });
+
+        camStream = stream;
+        userCamEl.srcObject = stream;
+        camReady = true;
+        camOverlay.style.display = "none";
+        showTitleOverlay("카메라 연결됨", "CAMERA READY");
+        return true;
+      } catch (err){
+        camReady = false;
+        camOverlay.style.display = "flex";
+        // 에러 메시지는 너무 기술적으로 노출하지 않고 안내만
+        showTitleOverlay("카메라 권한 필요", "PERMISSION");
+        return false;
+      }
+    }
+
+    function stopCamera(){
+      if(camStream){
+        camStream.getTracks().forEach(t => t.stop());
+      }
+      camStream = null;
+      camReady = false;
+      userCamEl.srcObject = null;
+      camOverlay.style.display = "flex";
+    }
+
+    allowCamBtn.addEventListener("click", async ()=>{
+      // 사용자 제스처 안에서 요청해야 허용창이 뜸
+      await requestCamera();
+      cameraModal.classList.remove("on");
+      showTitleOverlay("전시 시작", "BEGIN");
+    });
+
+    skipCamBtn.addEventListener("click", ()=>{
+      cameraModal.classList.remove("on");
+      showTitleOverlay("전시 시작", "BEGIN");
+    });
+
+    retryCamBtn.addEventListener("click", async ()=>{
+      await requestCamera();
+    });
+
+    stopCamBtn.addEventListener("click", ()=>{
+      stopCamera();
+      showTitleOverlay("카메라 종료", "STOP");
+    });
+
+    // ---- Logging ----
+    const STORAGE_KEY = "cctv_logs_v1";
+    let logs = [];
+    let activeQuadrant = null;
+    let completionTriggered = false;
+
+    const logListEl  = $("#logList");
+    const logCountEl = $("#logCount");
+    const logVideoEl = $("#logVideo");
+    const gridEl     = $("#cctvGrid");
+
+    function formatKoreanTime(ts){
+      const d = new Date(ts);
+      return d.toLocaleString("ko-KR", {
+        year:"numeric", month:"2-digit", day:"2-digit",
+        hour:"2-digit", minute:"2-digit", second:"2-digit"
+      });
+    }
+    function quadrantLabel(q){
+      return ({TL:"좌상단", TR:"우상단", BL:"좌하단", BR:"우하단"})[q] || q;
+    }
+    function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(logs)); }catch(e){} }
+    function load(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return;
+        const parsed = JSON.parse(raw);
+        if(Array.isArray(parsed)) logs = parsed;
+      }catch(e){}
+    }
+
+    function pickLogVideoSrc(){
+      if(!logs || logs.length===0) return "videos/log_default.mp4";
+      const counts = logs.reduce((acc,l)=>{
+        acc[l.quadrant] = (acc[l.quadrant]||0)+1;
+        return acc;
+      }, {});
+      const most = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+      if(most && most[1] >= 3){
+        return `videos/log_focus_${most[0]}.mp4`;
+      }
+      if(logs.length >= 5) return "videos/log_intense.mp4";
+      return "videos/log_default.mp4";
+    }
+
+    function render(){
+      logCountEl.textContent = String(logs.length);
+
+      logListEl.innerHTML = "";
+      if(logs.length===0){
+        const empty = document.createElement("div");
+        empty.className="log-item";
+        empty.innerHTML = `
+          <div>
+            <p class="log-title">아직 기록이 없습니다.</p>
+            <p class="log-meta">CCTV 화면을 클릭하면 로그가 생성됩니다.</p>
+          </div>
+          <div style="opacity:.5;font-size:12px">—</div>
+        `;
+        logListEl.appendChild(empty);
+      } else {
+        logs.forEach(item=>{
+          const row = document.createElement("div");
+          row.className="log-item";
+          row.innerHTML = `
+            <div>
+              <p class="log-title">[포착] ${quadrantLabel(item.quadrant)}</p>
+              <p class="log-meta">${item.atText}</p>
+            </div>
+            <div style="opacity:.6;font-size:12px">${item.quadrant}</div>
+          `;
+          logListEl.appendChild(row);
+        });
+      }
+
+      $$(".quad").forEach(el=>{
+        const q = el.getAttribute("data-q");
+        el.classList.toggle("selected", q === activeQuadrant);
+      });
+
+      const nextSrc = pickLogVideoSrc();
+      if(logVideoEl.getAttribute("src") !== nextSrc){
+        const wasPlaying = !logVideoEl.paused;
+        logVideoEl.setAttribute("src", nextSrc);
+        logVideoEl.load();
+        if(wasPlaying) logVideoEl.play().catch(()=>{});
+      }
+
+      logListEl.scrollTop = 0;
+    }
+
+    function triggerCameraSwitchEffect(q){
+      const el = $(`.quad[data-q="${q}"]`);
+      if(!el) return;
+      el.classList.add("switching");
+      setTimeout(()=> el.classList.remove("switching"), 220);
+    }
+
+    // completion overlay + force to outro + show camera
+    const completeOverlay = $("#completeOverlay");
+    function forceComplete(){
+      completeOverlay.classList.add("on");
+
+      setTimeout(()=>{
+        const outro = document.getElementById("s6");
+        if(outro) outro.scrollIntoView({behavior:"smooth", block:"start"});
+      }, 450);
+
+      setTimeout(()=>{
+        completeOverlay.classList.remove("on");
+      }, 2100);
+
+      showTitleOverlay("기록 완료", "RECORD COMPLETE");
+
+      // 여기서 "바로 내 카메라 화면"이 핵심:
+      // - 권한 허용했으면 이미 스트림 준비되어 있어야 하고
+      // - 혹시 아직 준비 안 됐으면(스킵/실패) 안내 오버레이가 그대로 보임
+      if(camReady){
+        camOverlay.style.display = "none";
+      } else {
+        camOverlay.style.display = "flex";
+      }
+    }
+
+    function addLog(quadrant){
+      const ts = Date.now();
+      logs.unshift({
+        id: `${ts}_${quadrant}_${Math.random().toString(16).slice(2)}`,
+        quadrant,
+        at: ts,
+        atText: formatKoreanTime(ts),
+        type: "select"
+      });
+      save();
+      render();
+
+      if(!completionTriggered && logs.length >= 5){
+        completionTriggered = true;
+        forceComplete();
+      }
+    }
+
+    gridEl.addEventListener("click", (e)=>{
+      const quad = e.target.closest(".quad");
+      if(!quad) return;
+      const q = quad.getAttribute("data-q");
+      activeQuadrant = q;
+
+      // 효과음 + 플래시 + 카메라 전환(같은 타이밍)
+      playSound(shutterAudio);
+      playSound(beepAudio);
+      flash();
+      triggerCameraSwitchEffect(q);
+
+      addLog(q);
+    });
+
+    $("#clearLogsBtn").addEventListener("click", ()=>{
+      logs = [];
+      activeQuadrant = null;
+      completionTriggered = false;
+      save();
+      render();
+      showTitleOverlay("로그 초기화", "RESET");
+    });
+
+    $("#exportLogsBtn").addEventListener("click", ()=>{
+      const blob = new Blob([JSON.stringify(logs, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "cctv_logs.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      showTitleOverlay("내보내기", "EXPORT");
+    });
+
+    // init
+    load();
+    render();
+
+    // UX: 모달 떠있는 동안 배경 스크롤을 막고 싶다면 여기서 main pointer-events 조절 가능
+  </script>
+</body>
+</html>

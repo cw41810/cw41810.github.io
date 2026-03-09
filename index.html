@@ -450,10 +450,10 @@
       position:relative;
     }
 
-    .experience-log-video-frame video{
+    .experience-log-video-frame iframe,
+    #logVideoPlayer{
       width:100%;
       height:100%;
-      object-fit:cover;
       display:block;
     }
 
@@ -1045,8 +1045,9 @@
       <div class="experience-panel" id="s5-log-video-panel">
         <div class="experience-log-video-stage reveal delay2">
           <div class="experience-log-video-frame">
-            <video id="logVideo" src="images/Log.mp4" autoplay muted playsinline></video>
+            <div id="logVideoPlayer"></div>
           </div>
+  <script src="https://www.youtube.com/iframe_api"></script>
         </div>
       </div>
     </section>
@@ -1256,8 +1257,12 @@
 
     const logListEl  = $("#logList");
     const logCountEl = $("#logCount");
-    const logVideoEl = $("#logVideo");
+    const logVideoEl = null;
     const gridEl     = $("#cctvGrid");
+
+    const LOG_YOUTUBE_ID = "0FK4Wn0TtIc";
+    let logPlayer = null;
+    let youtubeAPIReady = false;
 
     // ---- Random CCTV video assignment ----
     const TOTAL_CCTV = 48;
@@ -1366,7 +1371,7 @@
     }
 
     function pickLogVideoSrc(){
-      return "images/Log.mp4";
+      return null;
     }
 
     function render(){
@@ -1408,7 +1413,7 @@
       });
 
       const nextSrc = pickLogVideoSrc();
-      if(logVideoEl && logVideoEl.getAttribute("src") !== nextSrc){
+      if(logVideoEl && nextSrc && logVideoEl.getAttribute("src") !== nextSrc){
         const wasPlaying = !logVideoEl.paused;
         logVideoEl.setAttribute("src", nextSrc);
         logVideoEl.load();
@@ -1430,18 +1435,39 @@
         if(logPanel) logPanel.scrollIntoView({behavior:"smooth", block:"start"});
 
         setTimeout(()=>{
-          if(logVideoEl){
-            logVideoEl.currentTime = 0;
-            logVideoEl.play().catch(()=>{});
+          if(logPlayer && youtubeAPIReady){
+            try{
+              logPlayer.seekTo(0);
+              logPlayer.playVideo();
+            }catch(e){}
           }
         }, 650);
       }, 450);
     }
 
-    if(logVideoEl){
-      logVideoEl.addEventListener("ended", ()=>{
-        const outro = document.getElementById("s6");
-        if(outro) outro.scrollIntoView({behavior:"smooth", block:"start"});
+    function onYouTubeIframeAPIReady(){
+      youtubeAPIReady = true;
+      logPlayer = new YT.Player("logVideoPlayer", {
+        videoId: LOG_YOUTUBE_ID,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          mute: 1
+        },
+        events: {
+          onReady: (event) => {
+            event.target.mute();
+          },
+          onStateChange: (event) => {
+            if(event.data === YT.PlayerState.ENDED){
+              const outro = document.getElementById("s6");
+              if(outro) outro.scrollIntoView({behavior:"smooth", block:"start"});
+            }
+          }
+        }
       });
     }
 

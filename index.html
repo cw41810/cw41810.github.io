@@ -74,10 +74,17 @@
       padding:8px 10px;
       border-radius:999px;
       font-size:12px;
+      font-weight:500;
       cursor:pointer;
-      transition:transform .15s ease, background .15s ease;
+      transition:transform .15s ease, background .15s ease, font-weight .15s ease;
     }
     .pill:hover{background:rgba(255,255,255,.10); transform:translateY(-1px)}
+
+    .pill.active{
+      border-color:rgba(239,54,97,.65);
+      box-shadow:0 0 0 1px rgba(239,54,97,.25), 0 0 18px rgba(239,54,97,.18);
+      background:rgba(255,255,255,.06);
+    }
 
     /* typography */
     h1{
@@ -103,10 +110,7 @@
       margin-bottom:12px;
     }
     .kicker::before{
-      content:"";
-      width:30px; height:1px;
-      background:#EF3661;
-      box-shadow:0 0 16px rgba(239,54,97,.45);
+      content:none;
     }
 
     /* cards / layout */
@@ -257,17 +261,13 @@
       font-size:12px;
       letter-spacing:.18em;
       text-transform:uppercase;
-      color: rgba(239,54,97,.95);
+      color: rgba(246,247,251,.6);
       display:inline-flex;
       align-items:center;
       gap:10px;
     }
     .poster-tag::before{
-      content:"";
-      width:30px;
-      height:1px;
-      background: rgba(239,54,97,.85);
-      box-shadow:0 0 14px rgba(239,54,97,.35);
+      content:none;
     }
     .poster-title{
       margin:0 0 12px;
@@ -303,7 +303,7 @@
       height:auto;
       display:block;
       border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
+      border:none;
       box-shadow: var(--shadow);
       background: rgba(0,0,0,.20);
     }
@@ -380,7 +380,7 @@
       display:grid;
       grid-template-columns:1fr 1fr;
       grid-template-rows:1fr 1fr;
-      gap:10px;
+      gap:16px;
       margin-top:10px;
     }
 
@@ -508,7 +508,7 @@
       position:relative;
       border-radius:16px;
       overflow:hidden;
-      border:1px solid rgba(255,255,255,.14);
+      border:none;
       background:rgba(255,255,255,.05);
       cursor:pointer;
       user-select:none;
@@ -527,7 +527,7 @@
       transform:scale(1.02);
       transition: transform .18s ease, filter .18s ease;
     }
-    .quad:hover{transform:translateY(-2px); border-color:rgba(239,54,97,.45)}
+    .quad:hover{transform:translateY(-2px)}
     .quad:hover video{transform:scale(1.05)}
     .quad .label{
       position:absolute; left:10px; top:10px;
@@ -979,15 +979,15 @@
 
     <!-- 4 -->
     <section id="s4" data-title="인터랙션 규칙 안내" data-sub="RULES">
-    <div class="snap-panel">
+    <div class="snap-panel" id="s4a">
       <div class="rules-stage reveal delay2">
-        <div class="rules-panel snap-panel">
+        <div class="rules-panel">
           <h1 class="rules-message">당신은 <span class="accent">감시자</span>입니다</h1>
         </div>
       </div>
     </div>
 
-      <div class="rules-detail-panel">
+      <div class="rules-detail-panel" id="s4b">
         <div class="rules-detail-inner">
           <div class="rules-copy reveal delay2">
             <p>CCTV 화면을 모니터링하여 피사체의 사적 행동을 식별하십시오.</p>
@@ -1011,7 +1011,7 @@
     <!-- 5 -->
     <section id="s5" data-title="인터랙션 체험" data-sub="EXPERIENCE">
       <!-- Panel 1: CCTV 4분할 only -->
-      <div class="experience-panel">
+      <div class="experience-panel" id="s5a">
         <div class="experience-inner">
 
           <div class="experience-grid-only reveal delay2">
@@ -1042,13 +1042,13 @@
       </div>
 
       <!-- Panel 2: Log video only -->
-      <div class="experience-panel" id="s5-log-video-panel">
+      <div class="experience-panel" id="s5b">
         <div class="experience-log-video-stage reveal delay2">
           <div class="experience-log-video-frame">
             <div id="logVideoPlayer"></div>
           </div>
-                  </div>
-                </div>
+        </div>
+      </div>
     </section>
 
     <!-- 6 -->
@@ -1134,6 +1134,25 @@
       });
     });
 
+    const navButtons = $$('[data-go]');
+    const navMap = {
+      s1a: ["s1", "s1a", "s1b"],
+      s2: ["s2"],
+      s3: ["s3"],
+      s4: ["s4", "s4a", "s4b"],
+      s5: ["s5", "s5a", "s5b"],
+      s6: ["s6"],
+      s7: ["s7"]
+    };
+
+    function setActiveNav(sectionId){
+      navButtons.forEach(btn=>{
+        const go = btn.getAttribute('data-go');
+        const isActive = (navMap[go] || [go]).includes(sectionId);
+        btn.classList.toggle('active', isActive);
+      });
+    }
+
     // reveal on view
     const revealIO = new IntersectionObserver((entries)=>{
       entries.forEach(e=>{
@@ -1161,7 +1180,45 @@
         showTitleOverlay(sec.getAttribute("data-title"), sec.getAttribute("data-sub"));
       });
     }, {threshold: 0.55});
-    /*$$("section[data-title]").forEach(sec=>sectionIO.observe(sec));*/
+    $$("section[data-title]").forEach(sec=>sectionIO.observe(sec));
+
+    const navTargetIds = ["s1a", "s2", "s3", "s4a", "s4b", "s5a", "s5b", "s6", "s7"];
+    const navTargets = navTargetIds
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+
+    const navTargetIO = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(!e.isIntersecting) return;
+        setActiveNav(e.target.id);
+      });
+    }, {
+      threshold: 0.2,
+      rootMargin: "-12% 0px -35% 0px"
+    });
+
+    navTargets.forEach(el => navTargetIO.observe(el));
+
+    const scrollRoot = $("#scrollRoot");
+    if(scrollRoot){
+      scrollRoot.addEventListener("scroll", ()=>{
+        const viewportMid = window.innerHeight * 0.42;
+        let best = null;
+        let bestDist = Infinity;
+
+        navTargets.forEach(el => {
+          const rect = el.getBoundingClientRect();
+          const sectionMid = rect.top + rect.height / 2;
+          const dist = Math.abs(sectionMid - viewportMid);
+          if(dist < bestDist){
+            bestDist = dist;
+            best = el;
+          }
+        });
+
+        if(best) setActiveNav(best.id);
+      }, {passive:true});
+    }
 
     // flash
     function flash(){}
@@ -1431,7 +1488,7 @@
     // completion overlay + force to outro + show camera
     function forceComplete(){
       setTimeout(()=>{
-        const logPanel = document.getElementById("s5-log-video-panel");
+        const logPanel = document.getElementById("s5b");
         if(logPanel) logPanel.scrollIntoView({behavior:"smooth", block:"start"});
 
         setTimeout(()=>{
@@ -1544,6 +1601,7 @@ gridEl.addEventListener("click", (e)=>{
     load();
     render();
     initRandomCCTV();
+    setActiveNav("s1");
 
     // UX: 모달 떠있는 동안 배경 스크롤을 막고 싶다면 여기서 main pointer-events 조절 가능
   </script>

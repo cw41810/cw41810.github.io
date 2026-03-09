@@ -508,7 +508,7 @@
       position:relative;
       border-radius:16px;
       overflow:hidden;
-      border:none;
+      border:1px solid transparent;
       background:rgba(255,255,255,.05);
       cursor:pointer;
       user-select:none;
@@ -527,7 +527,7 @@
       transform:scale(1.02);
       transition: transform .18s ease, filter .18s ease;
     }
-    .quad:hover{transform:translateY(-2px)}
+    .quad:hover{transform:translateY(-2px); border-color:rgba(239,54,97,.45)}
     .quad:hover video{transform:scale(1.05)}
     .quad .label{
       position:absolute; left:10px; top:10px;

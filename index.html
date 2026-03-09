@@ -1367,6 +1367,7 @@
 
     function applyBatch(batch){
       currentBatch = batch.slice();
+      activeQuadrant = null;
       const quads = $$(".quad", gridEl);
 
       quads.forEach((quad, i) => {
@@ -1388,6 +1389,7 @@
           quad.dataset.clickable = "true";
         }
       });
+      render();
     }
 
     function initRandomCCTV(){

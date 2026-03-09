@@ -527,7 +527,7 @@
       transform:scale(1.02);
       transition: transform .18s ease, filter .18s ease;
     }
-    .quad:hover{transform:translateY(-2px); border-color:rgba(0,191,165,.45)}
+    .quad:hover{transform:translateY(-2px); border-color:rgba(239,54,97,.45)}
     .quad:hover video{transform:scale(1.05)}
     .quad .label{
       position:absolute; left:10px; top:10px;
@@ -549,14 +549,14 @@
     .quad.selected{
       outline:3px solid var(--teal);
       outline-offset:0;
-      box-shadow:0 0 0 1px rgba(0,191,165,.35), 0 0 40px rgba(0,191,165,.18);
+      box-shadow:0 0 0 1px rgba(239,54,97,.35), 0 0 40px rgba(239,54,97,.18);
     }
 
     /* camera switch effect triggered with sound */
     .quad.switching{
       transform:translateY(-2px) scale(1.02);
       filter: brightness(1.08) contrast(1.15);
-      border-color: rgba(0,191,165,.65);
+      border-color: rgba(239,54,97,.65);
     }
     .quad.switching video{
       transform:scale(1.10);
@@ -573,7 +573,7 @@
     .quad.switching::after{
       content:"";
       position:absolute; inset:0;
-      background: linear-gradient(90deg, rgba(0,191,165,.18), transparent 45%, rgba(255,255,255,.12));
+      background: linear-gradient(90deg, rgba(239,54,97,.18), transparent 45%, rgba(255,255,255,.12));
       mix-blend-mode: screen;
       animation: glitch .18s linear 1;
       pointer-events:none;
@@ -670,8 +670,8 @@
     .title-overlay .sub::before{
       content:"";
       width:34px; height:1px;
-      background:rgba(0,191,165,.85);
-      box-shadow:0 0 18px rgba(0,191,165,.45);
+      background:rgba(239,54,97,.85);
+      box-shadow:0 0 18px rgba(239,54,97,.45);
     }
 
     /* flash (0.1s) */
@@ -1047,9 +1047,8 @@
           <div class="experience-log-video-frame">
             <div id="logVideoPlayer"></div>
           </div>
-  <script src="https://www.youtube.com/iframe_api"></script>
-        </div>
-      </div>
+                  </div>
+                </div>
     </section>
 
     <!-- 6 -->
@@ -1121,6 +1120,7 @@
     </section>
   </main>
 
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     const $ = (sel, root=document) => root.querySelector(sel);
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));

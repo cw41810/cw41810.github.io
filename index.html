@@ -376,12 +376,133 @@
     .interaction{display:grid; grid-template-columns:1.2fr .8fr; gap:16px; align-items:start}
     .cctv-grid{
       width:100%;
-      aspect-ratio:16/9;
+      aspect-ratio:4/3;
       display:grid;
       grid-template-columns:1fr 1fr;
       grid-template-rows:1fr 1fr;
       gap:10px;
       margin-top:10px;
+    }
+
+    /* s5: three stacked fullscreen panels */
+    .experience-panel{
+      min-height:100vh;
+      scroll-snap-align:start;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:96px 24px 48px;
+    }
+
+    .experience-inner{
+      width:min(1120px, calc(100vw - 64px));
+      margin:0 auto;
+    }
+
+    .experience-copy{
+      margin-bottom:22px;
+    }
+
+    .experience-grid-only{
+      display:flex;
+      justify-content:center;
+    }
+
+    .experience-grid-card{
+      width:min(980px, 100%);
+      border:1px solid rgba(255,255,255,.12);
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .experience-grid-card h2,
+    .experience-video-card h2,
+    .experience-log-card h2{
+      margin-top:0;
+    }
+
+    .experience-video-card,
+    .experience-log-card{
+      width:min(980px, 100%);
+      border:1px solid rgba(255,255,255,.12);
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+      margin:0 auto;
+    }
+    
+    .experience-log-video-stage{
+      width:100%;
+      height:100vh;
+      margin:0;
+    }
+
+    .experience-log-video-frame{
+      width:100%;
+      height:100%;
+      background:#020611;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .experience-log-video-frame video{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .experience-video-full{
+      width:100%;
+      aspect-ratio:16/9;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      position:relative;
+      margin-top:10px;
+    }
+
+    .experience-video-full video{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .experience-log-full{
+      width:100%;
+      max-width:980px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:rgba(255,255,255,.06);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+      margin:0 auto;
+    }
+
+    .experience-log-full .log-list{
+      max-height:62vh;
+    }
+
+    @media (max-width: 900px){
+      .experience-panel{
+        padding:110px 20px 48px;
+      }
+
+      .experience-inner,
+      .experience-grid-card,
+      .experience-video-card,
+      .experience-log-card,
+      .experience-log-full{
+        width:min(100%, calc(100vw - 40px));
+      }
     }
     .quad{
       position:relative;
@@ -392,6 +513,13 @@
       cursor:pointer;
       user-select:none;
       transition: transform .18s ease, border-color .18s ease, filter .18s ease;
+    }
+    .quad.alert::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:rgba(239,54,97,.20);
+      pointer-events:none;
     }
     .quad video{
       width:100%; height:100%; object-fit:cover; display:block;
@@ -553,6 +681,7 @@
       opacity:0;
       pointer-events:none;
       z-index:200;
+      display:none;
     }
     .flash.on{ animation: flash .10s linear 1; }
     @keyframes flash{
@@ -690,6 +819,14 @@
       border-bottom:1px solid var(--line);
     }
 
+    section#s5{
+      padding:0;
+      display:block;
+      align-items:unset;
+      min-height:auto;
+      border-bottom:1px solid var(--line);
+    }
+
     .snap-panel{
       height:100vh;
       scroll-snap-align:start;
@@ -753,7 +890,7 @@
     <div class="panel">
       <p class="title">카메라 사용을 허용하시겠습니까?</p>
       <p class="desc">
-        전시 체험이 완료되면(기록 5회), 화면은 ‘관람자’로 전환됩니다.<br>
+        전시 체험이 완료되면(기록 12회), 다음 기록 단계로 이동합니다.<br>
         카메라 영상은 <b>브라우저 안에서만</b> 표시되며, 이 페이지는 업로드/전송 기능을 포함하지 않습니다.
       </p>
       <div class="row">
@@ -773,16 +910,6 @@
     </div>
   </div>
 
-  <!-- Flash -->
-  <div class="flash" id="flash"></div>
-
-  <!-- Completion overlay -->
-  <div class="complete-overlay" id="completeOverlay">
-    <div class="panel">
-      <p class="big">당신도 감시당하는 존재입니다.<br>기록이 완료되었습니다.</p>
-      <p class="small">대상은 ‘타인’에서 ‘나 자신’으로 전환됩니다.</p>
-    </div>
-  </div>
 
   <main id="scrollRoot">
     <!-- 1 -->
@@ -883,59 +1010,42 @@
 
     <!-- 5 -->
     <section id="s5" data-title="인터랙션 체험" data-sub="EXPERIENCE">
-      <div class="container">
-        <div class="kicker reveal">Experience</div>
-        <h1 class="reveal delay1">포착하라.<br/>그리고 기록하라.</h1>
-        <p class="lead reveal delay2">클릭 시: 찰칵/비프 + 플래시 + 카메라 전환. 로그 5개면 ‘관람자’로 전환.</p>
+      <!-- Panel 1: CCTV 4분할 only -->
+      <div class="experience-panel">
+        <div class="experience-inner">
 
-        <div class="interaction" style="margin-top:18px">
-          <div class="card reveal delay2">
-            <h2>CCTV 4분할 (클릭)</h2>
+          <div class="experience-grid-only reveal delay2">
+            <div class="experience-grid-card">
+              <h2>CCTV 화면</h2>
 
-            <div class="cctv-grid" id="cctvGrid">
-              <div class="quad" data-q="TL" title="클릭하여 포착">
-                <video src="videos/cctv_TL.mp4" muted autoplay loop playsinline></video>
-                <div class="label">좌상단</div><div class="hint">클릭</div>
+              <div class="cctv-grid" id="cctvGrid">
+                <div class="quad" data-q="TL" title="클릭하여 포착">
+                  <video muted autoplay loop playsinline></video>
+                  <div class="label">CAM1</div>
+                </div>
+                <div class="quad" data-q="TR" title="클릭하여 포착">
+                  <video muted autoplay loop playsinline></video>
+                  <div class="label">CAM2</div>
+                </div>
+                <div class="quad" data-q="BL" title="클릭하여 포착">
+                  <video muted autoplay loop playsinline></video>
+                  <div class="label">CAM3</div>
+                </div>
+                <div class="quad" data-q="BR" title="클릭하여 포착">
+                  <video muted autoplay loop playsinline></video>
+                  <div class="label">CAM4</div>
+                </div>
               </div>
-              <div class="quad" data-q="TR" title="클릭하여 포착">
-                <video src="videos/cctv_TR.mp4" muted autoplay loop playsinline></video>
-                <div class="label">우상단</div><div class="hint">클릭</div>
-              </div>
-              <div class="quad" data-q="BL" title="클릭하여 포착">
-                <video src="videos/cctv_BL.mp4" muted autoplay loop playsinline></video>
-                <div class="label">좌하단</div><div class="hint">클릭</div>
-              </div>
-              <div class="quad" data-q="BR" title="클릭하여 포착">
-                <video src="videos/cctv_BR.mp4" muted autoplay loop playsinline></video>
-                <div class="label">우하단</div><div class="hint">클릭</div>
-              </div>
-            </div>
-
-            <div style="margin-top:14px">
-              <h2 style="margin-top:0">감시 로그 영상(대체 체험)</h2>
-              <p class="muted">* 누적 로그에 따라 화면녹화 영상이 바뀌게 할 수 있음(샘플 규칙).</p>
-              <div class="media"><video id="logVideo" src="videos/log_default.mp4" controls></video></div>
-
-              <div class="row">
-                <button class="btn btn-danger" id="clearLogsBtn">로그 초기화</button>
-                <button class="btn" id="exportLogsBtn">로그 JSON 내보내기</button>
-              </div>
-
-              <p class="muted" style="font-size:12px;margin-top:10px">
-                * 오디오 파일: <code>audio/shutter.mp3</code>, <code>audio/beep.mp3</code> (없으면 무음)
-              </p>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="log reveal delay3">
-            <div class="log-head">
-              <div style="display:flex;flex-direction:column;gap:2px">
-                <div style="font-weight:900;letter-spacing:.2px">감시 로그</div>
-                <div class="muted" style="font-size:12px">클릭한 구역/시간이 기록됩니다.</div>
-              </div>
-              <div class="log-count" id="logCount">0</div>
-            </div>
-            <div class="log-list" id="logList"></div>
+      <!-- Panel 2: Log video only -->
+      <div class="experience-panel" id="s5-log-video-panel">
+        <div class="experience-log-video-stage reveal delay2">
+          <div class="experience-log-video-frame">
+            <video id="logVideo" src="images/Log.mp4" autoplay muted playsinline></video>
           </div>
         </div>
       </div>
@@ -1053,12 +1163,7 @@
     /*$$("section[data-title]").forEach(sec=>sectionIO.observe(sec));*/
 
     // flash
-    const flashEl = $("#flash");
-    function flash(){
-      flashEl.classList.remove("on");
-      void flashEl.offsetWidth;
-      flashEl.classList.add("on");
-    }
+    function flash(){}
 
     // audio
     const shutterAudio = new Audio("audio/shutter.mp3");
@@ -1147,11 +1252,98 @@
     let logs = [];
     let activeQuadrant = null;
     let completionTriggered = false;
+    let interactionComplete = false;
 
     const logListEl  = $("#logList");
     const logCountEl = $("#logCount");
     const logVideoEl = $("#logVideo");
     const gridEl     = $("#cctvGrid");
+
+    // ---- Random CCTV video assignment ----
+    const TOTAL_CCTV = 48;
+    const TOTAL_SELECTIONS = 12;
+
+    let remainingCCTV = [];
+    let remainingMultiples = [];
+    let currentBatch = [];
+    let selectionCount = 0;
+
+    function shuffle(arr){
+      for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function initCCTVPool(){
+      const allNumbers = Array.from({length: TOTAL_CCTV}, (_, i) => i + 1);
+      remainingMultiples = shuffle(allNumbers.filter(n => n % 4 === 0));
+      remainingCCTV = shuffle(allNumbers.filter(n => n % 4 !== 0));
+      currentBatch = [];
+      selectionCount = 0;
+      interactionComplete = false;
+    }
+
+    function getNextBatch(){
+      if(remainingMultiples.length < 1 || remainingCCTV.length < 3) return [];
+
+      const batch = [];
+
+      // exactly one unused multiple-of-4 per batch
+      const special = remainingMultiples.shift();
+      if(typeof special === "number"){
+        batch.push(special);
+      }
+
+      while(batch.length < 4 && remainingCCTV.length > 0){
+        batch.push(remainingCCTV.shift());
+      }
+
+      return shuffle(batch);
+    }
+
+    function applyBatch(batch){
+      currentBatch = batch.slice();
+      const quads = $$(".quad", gridEl);
+
+      quads.forEach((quad, i) => {
+        const num = currentBatch[i];
+        const video = quad.querySelector("video");
+
+        quad.classList.remove("alert");
+        quad.dataset.clickable = "false";
+        video.removeAttribute("src");
+
+        if(typeof num !== "number") return;
+
+        video.src = `images/CCTV_${num}.mp4`;
+        video.load();
+        video.play().catch(()=>{});
+
+        if(num % 4 === 0){
+          quad.classList.add("alert");
+          quad.dataset.clickable = "true";
+        }
+      });
+    }
+
+    function initRandomCCTV(){
+      initCCTVPool();
+      applyBatch(getNextBatch());
+    }
+
+    function advanceCCTVBatch(){
+      if(selectionCount >= TOTAL_SELECTIONS){
+        interactionComplete = true;
+        return;
+      }
+
+      const nextBatch = getNextBatch();
+      if(nextBatch.length === 4){
+        applyBatch(nextBatch);
+      }
+    }
 
     function formatKoreanTime(ts){
       const d = new Date(ts);
@@ -1174,47 +1366,40 @@
     }
 
     function pickLogVideoSrc(){
-      if(!logs || logs.length===0) return "videos/log_default.mp4";
-      const counts = logs.reduce((acc,l)=>{
-        acc[l.quadrant] = (acc[l.quadrant]||0)+1;
-        return acc;
-      }, {});
-      const most = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
-      if(most && most[1] >= 3){
-        return `videos/log_focus_${most[0]}.mp4`;
-      }
-      if(logs.length >= 5) return "videos/log_intense.mp4";
-      return "videos/log_default.mp4";
+      return "images/Log.mp4";
     }
 
     function render(){
-      logCountEl.textContent = String(logs.length);
+      if(logCountEl) logCountEl.textContent = String(logs.length);
 
-      logListEl.innerHTML = "";
-      if(logs.length===0){
-        const empty = document.createElement("div");
-        empty.className="log-item";
-        empty.innerHTML = `
-          <div>
-            <p class="log-title">아직 기록이 없습니다.</p>
-            <p class="log-meta">CCTV 화면을 클릭하면 로그가 생성됩니다.</p>
-          </div>
-          <div style="opacity:.5;font-size:12px">—</div>
-        `;
-        logListEl.appendChild(empty);
-      } else {
-        logs.forEach(item=>{
-          const row = document.createElement("div");
-          row.className="log-item";
-          row.innerHTML = `
+      if(logListEl){
+        logListEl.innerHTML = "";
+        if(logs.length===0){
+          const empty = document.createElement("div");
+          empty.className="log-item";
+          empty.innerHTML = `
             <div>
-              <p class="log-title">[포착] ${quadrantLabel(item.quadrant)}</p>
-              <p class="log-meta">${item.atText}</p>
+              <p class="log-title">아직 기록이 없습니다.</p>
+              <p class="log-meta">CCTV 화면을 클릭하면 로그가 생성됩니다.</p>
             </div>
-            <div style="opacity:.6;font-size:12px">${item.quadrant}</div>
+            <div style="opacity:.5;font-size:12px">—</div>
           `;
-          logListEl.appendChild(row);
-        });
+          logListEl.appendChild(empty);
+        } else {
+          logs.forEach(item=>{
+            const row = document.createElement("div");
+            row.className="log-item";
+            row.innerHTML = `
+              <div>
+                <p class="log-title">[포착] ${quadrantLabel(item.quadrant)}</p>
+                <p class="log-meta">${item.atText}</p>
+              </div>
+              <div style="opacity:.6;font-size:12px">${item.quadrant}</div>
+            `;
+            logListEl.appendChild(row);
+          });
+        }
+        logListEl.scrollTop = 0;
       }
 
       $$(".quad").forEach(el=>{
@@ -1223,14 +1408,12 @@
       });
 
       const nextSrc = pickLogVideoSrc();
-      if(logVideoEl.getAttribute("src") !== nextSrc){
+      if(logVideoEl && logVideoEl.getAttribute("src") !== nextSrc){
         const wasPlaying = !logVideoEl.paused;
         logVideoEl.setAttribute("src", nextSrc);
         logVideoEl.load();
         if(wasPlaying) logVideoEl.play().catch(()=>{});
       }
-
-      logListEl.scrollTop = 0;
     }
 
     function triggerCameraSwitchEffect(q){
@@ -1241,29 +1424,25 @@
     }
 
     // completion overlay + force to outro + show camera
-    const completeOverlay = $("#completeOverlay");
     function forceComplete(){
-      completeOverlay.classList.add("on");
-
       setTimeout(()=>{
+        const logPanel = document.getElementById("s5-log-video-panel");
+        if(logPanel) logPanel.scrollIntoView({behavior:"smooth", block:"start"});
+
+        setTimeout(()=>{
+          if(logVideoEl){
+            logVideoEl.currentTime = 0;
+            logVideoEl.play().catch(()=>{});
+          }
+        }, 650);
+      }, 450);
+    }
+
+    if(logVideoEl){
+      logVideoEl.addEventListener("ended", ()=>{
         const outro = document.getElementById("s6");
         if(outro) outro.scrollIntoView({behavior:"smooth", block:"start"});
-      }, 450);
-
-      setTimeout(()=>{
-        completeOverlay.classList.remove("on");
-      }, 2100);
-
-      showTitleOverlay("기록 완료", "RECORD COMPLETE");
-
-      // 여기서 "바로 내 카메라 화면"이 핵심:
-      // - 권한 허용했으면 이미 스트림 준비되어 있어야 하고
-      // - 혹시 아직 준비 안 됐으면(스킵/실패) 안내 오버레이가 그대로 보임
-      if(camReady){
-        camOverlay.style.display = "none";
-      } else {
-        camOverlay.style.display = "flex";
-      }
+      });
     }
 
     function addLog(quadrant){
@@ -1277,51 +1456,68 @@
       });
       save();
       render();
-
-      if(!completionTriggered && logs.length >= 5){
-        completionTriggered = true;
-        forceComplete();
-      }
     }
 
-    gridEl.addEventListener("click", (e)=>{
+gridEl.addEventListener("click", (e)=>{
+      if(interactionComplete) return;
+
       const quad = e.target.closest(".quad");
       if(!quad) return;
+      if(quad.dataset.clickable !== "true") return;
       const q = quad.getAttribute("data-q");
       activeQuadrant = q;
 
-      // 효과음 + 플래시 + 카메라 전환(같은 타이밍)
       playSound(shutterAudio);
       playSound(beepAudio);
       flash();
       triggerCameraSwitchEffect(q);
 
       addLog(q);
+
+      selectionCount += 1;
+
+      if(selectionCount >= TOTAL_SELECTIONS){
+        completionTriggered = true;
+        interactionComplete = true;
+        forceComplete();
+      } else {
+        advanceCCTVBatch();
+      }
     });
 
-    $("#clearLogsBtn").addEventListener("click", ()=>{
-      logs = [];
-      activeQuadrant = null;
-      completionTriggered = false;
-      save();
-      render();
-      showTitleOverlay("로그 초기화", "RESET");
-    });
+    const clearLogsBtn = $("#clearLogsBtn");
+    if(clearLogsBtn){
+      clearLogsBtn.addEventListener("click", ()=>{
+        logs = [];
+        activeQuadrant = null;
+        completionTriggered = false;
+        interactionComplete = false;
+        selectionCount = 0;
+        save();
+        render();
+        initRandomCCTV();
+        showTitleOverlay("로그 초기화", "RESET");
+      });
+    }
 
-    $("#exportLogsBtn").addEventListener("click", ()=>{
-      const blob = new Blob([JSON.stringify(logs, null, 2)], {type:"application/json"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "cctv_logs.json";
-      a.click();
-      URL.revokeObjectURL(url);
-      showTitleOverlay("내보내기", "EXPORT");
-    });
+    const exportLogsBtn = $("#exportLogsBtn");
+    if(exportLogsBtn){
+      exportLogsBtn.addEventListener("click", ()=>{
+        const blob = new Blob([JSON.stringify(logs, null, 2)], {type:"application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "cctv_logs.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        showTitleOverlay("내보내기", "EXPORT");
+      });
+    }
 
     // init
     load();
     render();
+    initRandomCCTV();
 
     // UX: 모달 떠있는 동안 배경 스크롤을 막고 싶다면 여기서 main pointer-events 조절 가능
   </script>

@@ -3,8 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CCTV Online Exhibition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
+  <title>City of Eyes</title>
   <style>
+    @font-face {
+        font-family: 'Xcu';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2506-1@1.0/exqt.woff2') format('woff2');
+        font-weight: normal;
+        font-display: swap;
+    }
     :root{
       --teal:#EF3661;
       --bg:#0b0c10;
@@ -19,8 +28,7 @@
     html,body{height:100%}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR";
+      font-family: "Noto Sans KR", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo";
       background: radial-gradient(1200px 700px at 20% 10%, rgba(0,191,165,.15), transparent 55%),
                   radial-gradient(900px 600px at 90% 30%, rgba(255,255,255,.08), transparent 60%),
                   var(--bg);
@@ -58,7 +66,7 @@
       display:flex; align-items:center; justify-content:space-between; gap:12px;
       pointer-events:auto;
     }
-    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.2px}
     .badge{
       font-size:12px; padding:6px 10px; border-radius:999px;
       border:1px solid rgba(239,54,97,.35);
@@ -92,6 +100,16 @@
       font-size: clamp(34px, 3.4vw, 54px);
       letter-spacing:-.8px;
       line-height:1.08;
+      font-weight:400;
+    }
+    .subtitle-medium{
+      font-size:44px;
+      letter-spacing:-0.6px;
+      line-height:1.15;
+      font-weight:600;
+      color:#F6F7FB;
+      word-break:keep-all;
+      line-break:strict;
     }
     h2{
       margin:0 0 10px;
@@ -137,7 +155,7 @@
       font-size: clamp(40px, 5.8vw, 72px);
       line-height:1.12;
       letter-spacing:-1px;
-      font-weight:900;
+      font-weight:600;
       color:rgba(246,247,251,.96);
       word-break:keep-all;
       line-break:strict;
@@ -271,13 +289,13 @@
     }
     .poster-title{
       margin:0 0 12px;
-      font-size: clamp(24px, 3.0vw, 44px);
-      letter-spacing:-.6px;
+      font-size:44px;
+      letter-spacing:-0.6px;
       line-height:1.15;
-      color: rgba(246,247,251,.95);
-      font-weight:900;
-      word-break: keep-all;
-      line-break: strict;
+      color:#F6F7FB;
+      font-weight:600;
+      word-break:keep-all;
+      line-break:strict;
     }
     .poster-desc{
       margin:0;
@@ -520,12 +538,15 @@
       inset:0;
       background:rgba(239,54,97,.20);
       pointer-events:none;
+      z-index:1;
     }
     .quad video{
       width:100%; height:100%; object-fit:cover; display:block;
       filter:contrast(1.05) saturate(1.1);
       transform:scale(1.02);
       transition: transform .18s ease, filter .18s ease;
+      position:relative;
+      z-index:0;
     }
     .quad:hover{transform:translateY(-2px); border-color:rgba(239,54,97,.45)}
     .quad:hover video{transform:scale(1.05)}
@@ -536,6 +557,7 @@
       background:rgba(0,0,0,.55);
       border:1px solid rgba(255,255,255,.10);
       color:#fff; font-size:12px;
+      z-index:3;
     }
     .quad .hint{
       position:absolute; right:10px; bottom:10px;
@@ -655,7 +677,7 @@
       font-size: clamp(28px, 4.2vw, 64px);
       letter-spacing:-1px;
       line-height:1.05;
-      font-weight:900;
+      font-weight:700;
       color:rgba(246,247,251,.92);
       text-shadow: 0 20px 70px rgba(0,0,0,.55);
     }
@@ -716,7 +738,7 @@
     .complete-overlay .big{
       margin:0;
       font-size: clamp(22px, 3.2vw, 40px);
-      font-weight:900;
+      font-weight:700;
       letter-spacing:-.8px;
       line-height:1.15;
     }
@@ -748,7 +770,7 @@
     .modal .title{
       margin:0 0 8px;
       font-size: clamp(18px, 2.2vw, 28px);
-      font-weight:900;
+      font-weight:600;
       letter-spacing:-.6px;
     }
     .modal .desc{margin:0 0 14px; color:rgba(246,247,251,.75)}
@@ -764,7 +786,6 @@
       border-color: rgba(0,191,165,.55);
       background: rgba(0,191,165,.18);
       color: rgba(0,255,221,.95);
-      font-weight:800;
     }
 
     /* Camera view inside outro */
@@ -827,10 +848,253 @@
       border-bottom:1px solid var(--line);
     }
 
+    section#s6{
+      padding:0;
+      display:block;
+      align-items:unset;
+      min-height:100vh;
+    }
+
+    #s6 .container{
+      max-width:none;
+      margin:0;
+      width:100%;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* hide everything except camera */
+    #s6 .kicker,
+    #s6 h1,
+    #s6 .lead,
+    #s6 .camera-note{
+      display:none;
+    }
+
+    #s6 .camera-wrap{
+      display:block;
+      width:100%;
+      height:100%;
+    }
+
+    #s6 .card{
+      width:100%;
+      height:100%;
+      border:none;
+      border-radius:0;
+      padding:0;
+      box-shadow:none;
+      background:black;
+    }
+
+    #s6 .media{
+      width:100%;
+      height:100%;
+      aspect-ratio:auto;
+      border:none;
+      border-radius:0;
+      background:black;
+      position:relative;
+      isolation:isolate;
+    }
+
+    #s6 .media::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      background:
+        linear-gradient(to bottom, rgba(130,190,255,.26), rgba(45,120,255,.16) 48%, rgba(8,28,72,.34)),
+        radial-gradient(1200px 700px at 70% 20%, rgba(140,205,255,.26), transparent 58%),
+        radial-gradient(900px 600px at 12% 70%, rgba(55,120,255,.18), transparent 60%);
+      mix-blend-mode:screen;
+      opacity:0;
+    }
+
+    #s6.camera-sequence-start .media::after{
+      animation: cameraBlueWash 10s linear forwards;
+    }
+
+    #s6 video#userCam{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      filter:grayscale(1) saturate(0) contrast(1.04) brightness(.88);
+    }
+
+    #s6.camera-sequence-start video#userCam{
+      animation: cameraColorShift 10s linear forwards;
+    }
+
+    #s6 .media{
+      position:relative;
+      overflow:hidden;
+    }
+
+    .camera-log-overlay{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:2;
+      overflow:hidden;
+      padding:26px 0 0;
+      opacity:1;
+      --camera-log-offset: 185%;
+      -webkit-mask-image: linear-gradient(to bottom,
+        rgba(0,0,0,0) 0px,
+        rgba(0,0,0,.12) 80px,
+        rgba(0,0,0,.45) 140px,
+        rgba(0,0,0,1) 200px,
+        rgba(0,0,0,1) 100%);
+      mask-image: linear-gradient(to bottom,
+        rgba(0,0,0,0) 0px,
+        rgba(0,0,0,.12) 80px,
+        rgba(0,0,0,.45) 140px,
+        rgba(0,0,0,1) 200px,
+        rgba(0,0,0,1) 100%);
+    }
+
+    .camera-log-intro{
+      position:absolute;
+      left:0;
+      right:0;
+      top:0;
+      will-change:transform;
+      transform:translateY(var(--camera-log-offset));
+      animation-play-state:paused;
+      animation-fill-mode:both;
+    }
+
+    #s6.camera-sequence-start .camera-log-intro{
+      animation: cameraLogIntro 6s linear 10s forwards;
+    }
+
+    .camera-log-track{
+      display:flex;
+      flex-direction:column;
+      will-change:transform;
+      transform:translateY(0);
+      animation-play-state:paused;
+      animation-fill-mode:both;
+    }
+
+    #s6.camera-sequence-start .camera-log-track{
+      animation: cameraLogLoop 20s linear 16s infinite;
+    }
+
+    .camera-log-row{
+      white-space:nowrap;
+      font-size:25px;
+      line-height:1.3;
+      letter-spacing:.02em;
+      color:rgba(210,235,255,.42);
+      font-family:"Xcu", "Noto Sans KR", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo";
+      margin:0;
+      padding:0 0 8px;
+      transform:translateX(0);
+      flex:0 0 auto;
+    }
+
+    .camera-log-row strong{
+      color:rgba(235,245,255,.62);
+      font-weight:500;
+    }
+
+    .camera-rec-badge{
+      position:absolute;
+      top:60px;
+      left:50px;
+      z-index:3;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      background:rgba(0,0,0,.58);
+      border:1px solid rgba(255,255,255,.10);
+      color:rgba(246,247,251,.96);
+      font-size:15px;
+      line-height:1;
+      letter-spacing:.02em;
+      pointer-events:none;
+    }
+
+    .camera-rec-dot{
+      width:12px;
+      height:12px;
+      border-radius:999px;
+      background:#EF3661;
+      box-shadow:0 0 12px rgba(239,54,97,.55);
+      animation: cameraRecBlink 1.15s ease-in-out infinite;
+    }
+
+    @keyframes cameraRecBlink{
+      0%, 100%{opacity:1}
+      50%{opacity:.25}
+    }
+
+    @keyframes cameraColorShift{
+      0%{
+        filter:grayscale(1) saturate(0) contrast(1.02) brightness(.88);
+      }
+      20%{
+        filter:grayscale(.92) saturate(.10) contrast(1.03) brightness(.885);
+      }
+      40%{
+        filter:grayscale(.78) saturate(.28) contrast(1.04) brightness(.89);
+      }
+      60%{
+        filter:grayscale(.58) sepia(.10) hue-rotate(150deg) saturate(.65) contrast(1.05) brightness(.905);
+      }
+      80%{
+        filter:grayscale(.34) sepia(.22) hue-rotate(162deg) saturate(1.25) contrast(1.06) brightness(.925);
+      }
+      100%{
+        filter:grayscale(.16) sepia(.32) hue-rotate(168deg) saturate(2.2) contrast(1.08) brightness(.94);
+      }
+    }
+
+    @keyframes cameraBlueWash{
+      0%{opacity:0}
+      20%{opacity:.06}
+      40%{opacity:.14}
+      60%{opacity:.24}
+      80%{opacity:.38}
+      100%{opacity:.55}
+    }
+
+
+    @keyframes cameraLogIntro{
+      0%{transform:translateY(var(--camera-log-offset))}
+      100%{transform:translateY(0)}
+    }
+
+    @keyframes cameraLogLoop{
+      0%{transform:translateY(0)}
+      100%{transform:translateY(-50%)}
+    }
+
+    /* hide buttons */
+    #s6 .row{
+      display:none;
+    }
+
     .snap-panel{
       height:100vh;
       scroll-snap-align:start;
       position:relative;
+    }
+
+    #s1b{
+      height:240vh;
+    }
+
+    #s1b .hero{
+      position:sticky;
+      top:0;
+      height:100vh;
     }
 
     .hero{
@@ -839,6 +1103,7 @@
       height:100%;               /* fill snap-panel */
       overflow:hidden;
       background:#000;
+      --parallax-progress: 0;
     }
 
     .hero img{
@@ -847,6 +1112,30 @@
       object-fit:cover;
       display:block;
       filter: contrast(1.05) saturate(1.05);
+    }
+
+    .hero-parallax-bg,
+    .hero-parallax-people{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      pointer-events:none;
+    }
+
+    .hero-parallax-bg{
+      object-fit:cover;
+      transform: translateY(0) scale(1);
+      filter: contrast(1.05) saturate(1.05);
+    }
+
+    .hero-parallax-people{
+      object-fit:cover;
+      transform: translateY(calc((1 - var(--parallax-progress, 0)) * 100%));
+      opacity:1;
+      transition: transform .08s linear;
+      will-change: transform;
     }
 
     /* optional: subtle vignette for readability under nav */
@@ -890,7 +1179,6 @@
     <div class="panel">
       <p class="title">카메라 사용을 허용하시겠습니까?</p>
       <p class="desc">
-        전시 체험이 완료되면(기록 12회), 다음 기록 단계로 이동합니다.<br>
         카메라 영상은 <b>브라우저 안에서만</b> 표시되며, 이 페이지는 업로드/전송 기능을 포함하지 않습니다.
       </p>
       <div class="row">
@@ -922,13 +1210,14 @@
     </div>
   </div>
 
-  <!-- Panel 2: Exhibition hall (fullscreen) -->
-  <div class="snap-panel" id="s1b">
-    <div class="hero">
-      <div class="hero-safe"></div>
-      <img src="images/exhibition_hall.png" alt="Exhibition hall visual">
+  <!-- Panel 2: Exhibition hall + rising people overlay -->
+    <div class="snap-panel" id="s1b">
+      <div class="hero hero-parallax" id="heroParallax">
+        <div class="hero-safe"></div>
+        <img class="hero-parallax-bg" src="images/exhibition_hall.png" alt="Exhibition hall visual">
+        <img class="hero-parallax-people" src="images/people.png" alt="People in exhibition hall">
+      </div>
     </div>
-  </div>
 </section>
 
     <!-- 2 -->
@@ -966,7 +1255,7 @@
     <section id="s3" data-title="인터랙션 인트로" data-sub="WORLD-BUILDING">
       <div class="container">
         <div class="kicker reveal">Interaction</div>
-        <h1 class="reveal delay1">도시는 점점 더 <br>촘촘한 눈으로 뒤덮인다.</h1>
+        <h1 class="reveal delay1 subtitle-medium">도시는 점점 더 <br>촘촘한 눈으로 뒤덮인다.</h1>
         <div class="interaction-video-wrap reveal delay3">
           <div class="interaction-video-inner">
             <div class="interaction-video-frame">
@@ -1016,7 +1305,7 @@
 
           <div class="experience-grid-only reveal delay2">
             <div class="experience-grid-card">
-              <h2>CCTV 화면</h2>
+              <h2 style="font-weight:600;">CCTV 화면</h2>
 
               <div class="cctv-grid" id="cctvGrid">
                 <div class="quad" data-q="TL" title="클릭하여 포착">
@@ -1060,10 +1349,11 @@
 
         <div class="camera-wrap">
           <div class="card reveal delay3">
-            <div class="camera-state">LIVE CAMERA FEED</div>
             <div class="media">
               <!-- 사용자 카메라 -->
               <video id="userCam" autoplay playsinline muted></video>
+              <div class="camera-rec-badge"><span>REC</span><span class="camera-rec-dot"></span></div>
+              <div class="camera-log-overlay" id="cameraLogOverlay"></div>
               <!-- 상태 오버레이 -->
               <div id="camOverlay" style="
                 position:absolute; inset:0;
@@ -1072,12 +1362,12 @@
                 color:rgba(246,247,251,.9);
                 text-align:center;
                 padding:16px;
-                font-weight:800;
+                font-weight:600;
                 letter-spacing:-.3px;
               ">
                 <div>
-                  <div style="font-size:18px; margin-bottom:6px">카메라가 준비되지 않았습니다</div>
-                  <div style="font-size:13px; color:rgba(246,247,251,.70); font-weight:600">
+                  <div style="font-size:18px; margin-bottom:6px; font-weight:600">카메라가 준비되지 않았습니다</div>
+                  <div style="font-size:13px; color:rgba(246,247,251,.70); font-weight:400">
                     상단 시작 모달에서 “허용하고 시작”을 눌러주세요.
                   </div>
                 </div>
@@ -1177,6 +1467,9 @@
       entries.forEach(e=>{
         if(!e.isIntersecting) return;
         const sec = e.target;
+        if(sec.id === "s6"){
+          startCameraSequence();
+        }
         showTitleOverlay(sec.getAttribute("data-title"), sec.getAttribute("data-sub"));
       });
     }, {threshold: 0.55});
@@ -1199,7 +1492,22 @@
 
     navTargets.forEach(el => navTargetIO.observe(el));
 
-    const scrollRoot = $("#scrollRoot");
+    const heroParallax = $("#heroParallax");
+
+    function updateHeroParallax(){
+      if(!heroParallax) return;
+      const panel = document.getElementById("s1b");
+      if(!panel) return;
+
+      const rect = panel.getBoundingClientRect();
+      const viewportH = window.innerHeight || document.documentElement.clientHeight;
+      const travel = Math.max(panel.offsetHeight - viewportH, 1);
+      const distance = Math.max(0, -rect.top);
+      const progress = Math.max(0, Math.min(1, distance / travel));
+
+      heroParallax.style.setProperty("--parallax-progress", progress.toFixed(3));
+    }
+
     if(scrollRoot){
       scrollRoot.addEventListener("scroll", ()=>{
         const viewportMid = window.innerHeight * 0.42;
@@ -1217,6 +1525,7 @@
         });
 
         if(best) setActiveNav(best.id);
+        updateHeroParallax();
       }, {passive:true});
     }
 
@@ -1244,9 +1553,13 @@
     const stopCamBtn  = $("#stopCamBtn");
     const userCamEl   = $("#userCam");
     const camOverlay  = $("#camOverlay");
+    const cameraLogOverlay = $("#cameraLogOverlay");
+    const s6Section = document.getElementById("s6");
 
     let camStream = null;
     let camReady = false;
+    let cameraStartTime = null;
+    let cameraSequenceStarted = false;
 
     async function requestCamera(){
       // NOTE: https/localhost 권장
@@ -1282,6 +1595,34 @@
       camReady = false;
       userCamEl.srcObject = null;
       camOverlay.style.display = "flex";
+    }
+
+    function startCameraSequence(){
+      if(!s6Section || cameraSequenceStarted) return;
+
+      cameraSequenceStarted = true;
+      cameraStartTime = Date.now();
+
+      // force reflow so animation always restarts cleanly
+      s6Section.classList.remove("camera-sequence-start");
+      void s6Section.offsetWidth;
+      s6Section.classList.add("camera-sequence-start");
+
+      renderCameraLogOverlay();
+
+      // after logs start rising (10s blue + 6s intro), wait 12s then move to next section
+      const LOG_START_DELAY = 10000; // blue transition
+      const LOG_INTRO_DURATION = 6000; // intro rise
+      const AFTER_LOG_DURATION = 12000; // hold before moving
+
+      const totalDelay = LOG_START_DELAY + LOG_INTRO_DURATION + AFTER_LOG_DURATION;
+
+      setTimeout(()=>{
+        const nextSection = document.getElementById("s7");
+        if(nextSection){
+          nextSection.scrollIntoView({behavior:"smooth", block:"start"});
+        }
+      }, totalDelay);
     }
 
     allowCamBtn.addEventListener("click", async ()=>{
@@ -1416,6 +1757,66 @@
         hour:"2-digit", minute:"2-digit", second:"2-digit"
       });
     }
+
+    function formatOverlayTime(offsetMs = 0){
+      const total = Math.max(0, offsetMs);
+      const hh = String(Math.floor(total / 3600000)).padStart(2, "0");
+      const mi = String(Math.floor((total % 3600000) / 60000)).padStart(2, "0");
+      const ss = String(Math.floor((total % 60000) / 1000)).padStart(2, "0");
+      const mss = String(Math.floor(total % 1000)).padStart(3, "0");
+      return `00-00-00 ${hh}:${mi}:${ss}.${mss}`;
+    }
+
+    function cameraButtonLabel(q){
+      return ({TL:"Button 1", TR:"Button 2", BL:"Button 3", BR:"Button 4"})[q] || "Button";
+    }
+
+    function renderCameraLogOverlay(){
+      if(!cameraLogOverlay) return;
+
+      const sourceLogs = logs.length
+        ? [...logs].slice(0, 12).reverse()
+        : [
+            {at: 0, quadrant:"TL"},
+            {at: 180, quadrant:"TR"},
+            {at: 420, quadrant:"BR"},
+            {at: 760, quadrant:"BL"},
+            {at: 1210, quadrant:"TL"},
+            {at: 1680, quadrant:"TR"}
+          ];
+
+      const originAt = typeof sourceLogs[0]?.at === "number" ? sourceLogs[0].at : 0;
+      const blueShiftDelay = 10000;
+
+      const baseEntries = sourceLogs.map(item => {
+        const relativeOffset = Math.max(0, (item.at || 0) - originAt);
+        const timeText = formatOverlayTime(blueShiftDelay + relativeOffset);
+        const buttonText = cameraButtonLabel(item.quadrant);
+        return `${timeText}  ${buttonText} pressed`;
+      });
+
+      const rows = [];
+      const rowCount = 18;
+      for(let i = 0; i < rowCount; i++){
+        const start = i % Math.max(baseEntries.length, 1);
+        const ordered = [];
+        for(let j = 0; j < baseEntries.length; j++){
+          ordered.push(baseEntries[(start + j) % baseEntries.length]);
+        }
+        const repeated = `${ordered.join("   ")}   ${ordered.join("   ")}   ${ordered.join("   ")}`;
+        rows.push(`<p class="camera-log-row">${repeated}</p>`);
+      }
+
+      const blockHtml = rows.join("");
+      cameraLogOverlay.innerHTML = `
+        <div class="camera-log-intro">
+          <div class="camera-log-track">
+            ${blockHtml}
+            ${blockHtml}
+          </div>
+        </div>
+      `;
+    }
     function quadrantLabel(q){
       return ({TL:"좌상단", TR:"우상단", BL:"좌하단", BR:"우하단"})[q] || q;
     }
@@ -1470,6 +1871,7 @@
         const q = el.getAttribute("data-q");
         el.classList.toggle("selected", q === activeQuadrant);
       });
+      renderCameraLogOverlay();
 
       const nextSrc = pickLogVideoSrc();
       if(logVideoEl && nextSrc && logVideoEl.getAttribute("src") !== nextSrc){
@@ -1602,8 +2004,10 @@ gridEl.addEventListener("click", (e)=>{
     // init
     load();
     render();
+    renderCameraLogOverlay();
     initRandomCCTV();
     setActiveNav("s1");
+    updateHeroParallax();
 
     // UX: 모달 떠있는 동안 배경 스크롤을 막고 싶다면 여기서 main pointer-events 조절 가능
   </script>

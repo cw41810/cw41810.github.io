@@ -852,7 +852,48 @@
       padding:0;
       display:block;
       align-items:unset;
+      min-height:auto;
+    }
+
+    section#s7{
+      padding:0;
+      display:block;
       min-height:100vh;
+      border-bottom:none;
+    }
+
+    #s7 .survey-stage{
+      width:100%;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 24px;
+      text-align:center;
+    }
+
+    #s7 .survey-link{
+      display:inline-flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      color:rgba(246,247,251,.96);
+      text-decoration:none;
+    }
+
+    #s7 .survey-link strong{
+      font-size:32px;
+      line-height:1.35;
+      font-weight:600;
+      letter-spacing:-0.02em;
+    }
+
+    #s7 .survey-link span{
+      font-size:14px;
+      line-height:1.5;
+      color:rgba(246,247,251,.62);
+      text-decoration:underline;
+      text-underline-offset:3px;
     }
 
     #s6 .container{
@@ -1079,6 +1120,50 @@
     /* hide buttons */
     #s6 .row{
       display:none;
+    }
+
+    #s6 .outro-panel{
+      min-height:100vh;
+      scroll-snap-align:start;
+      position:relative;
+    }
+
+    #s6a{
+      height:100vh;
+    }
+
+    #s6b{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:72px 24px;
+    }
+
+    .outro-video-stage{
+      width:min(1120px, calc(100vw - 64px));
+      margin:0 auto;
+    }
+
+    .outro-video-frame{
+      width:100%;
+      aspect-ratio:16/9;
+      background:#020611;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .outro-video-frame iframe,
+    #outroVideoPlayer{
+      width:100%;
+      height:100%;
+      display:block;
+      border:0;
+    }
+
+    @media (max-width: 900px){
+      .outro-video-stage{
+        width:min(100%, calc(100vw - 40px));
+      }
     }
 
     .snap-panel{
@@ -1342,70 +1427,77 @@
 
     <!-- 6 -->
     <section id="s6" data-title="아웃트로" data-sub="OUTRO">
-      <div class="container">
-        <div class="kicker reveal">Outro</div>
-        <h1 class="reveal delay1">당신도 감시당하는 존재입니다.<br/>기록이 완료되었습니다.</h1>
-        <p class="lead reveal delay2">아래는 ‘관람자(당신)’ 화면입니다.</p>
+      <div class="outro-panel" id="s6a">
+        <div class="container">
+          <div class="kicker reveal">Outro</div>
+          <h1 class="reveal delay1">당신도 감시당하는 존재입니다.<br/>기록이 완료되었습니다.</h1>
+          <p class="lead reveal delay2">아래는 ‘관람자(당신)’ 화면입니다.</p>
 
-        <div class="camera-wrap">
-          <div class="card reveal delay3">
-            <div class="media">
-              <!-- 사용자 카메라 -->
-              <video id="userCam" autoplay playsinline muted></video>
-              <div class="camera-rec-badge"><span>REC</span><span class="camera-rec-dot"></span></div>
-              <div class="camera-log-overlay" id="cameraLogOverlay"></div>
-              <!-- 상태 오버레이 -->
-              <div id="camOverlay" style="
-                position:absolute; inset:0;
-                display:flex; align-items:center; justify-content:center;
-                background:rgba(0,0,0,.45);
-                color:rgba(246,247,251,.9);
-                text-align:center;
-                padding:16px;
-                font-weight:600;
-                letter-spacing:-.3px;
-              ">
-                <div>
-                  <div style="font-size:18px; margin-bottom:6px; font-weight:600">카메라가 준비되지 않았습니다</div>
-                  <div style="font-size:13px; color:rgba(246,247,251,.70); font-weight:400">
-                    상단 시작 모달에서 “허용하고 시작”을 눌러주세요.
+          <div class="camera-wrap">
+            <div class="card reveal delay3">
+              <div class="media">
+                <video id="userCam" autoplay playsinline muted></video>
+                <div class="camera-rec-badge"><span>REC</span><span class="camera-rec-dot"></span></div>
+                <div class="camera-log-overlay" id="cameraLogOverlay"></div>
+
+                <div id="camOverlay" style="
+                  position:absolute; inset:0;
+                  display:flex; align-items:center; justify-content:center;
+                  background:rgba(0,0,0,.45);
+                  color:rgba(246,247,251,.9);
+                  text-align:center;
+                  padding:16px;
+                  font-weight:600;
+                  letter-spacing:-.3px;
+                ">
+                  <div>
+                    <div style="font-size:18px; margin-bottom:6px; font-weight:600">카메라가 준비되지 않았습니다</div>
+                    <div style="font-size:13px; color:rgba(246,247,251,.70); font-weight:400">
+                      상단 시작 모달에서 “허용하고 시작”을 눌러주세요.
+                    </div>
                   </div>
                 </div>
               </div>
+
+              <div class="row">
+                <button class="btn" id="retryCamBtn">카메라 다시 요청</button>
+                <button class="btn btn-danger" id="stopCamBtn">카메라 끄기</button>
+              </div>
             </div>
 
-            <div class="row">
-              <button class="btn" id="retryCamBtn">카메라 다시 요청</button>
-              <button class="btn btn-danger" id="stopCamBtn">카메라 끄기</button>
+            <div class="camera-note reveal delay3">
+              <h2>메시지</h2>
+              <p>당신의 선택은 기록이 되었고, 그 시선은 결국 당신에게 돌아옵니다.</p>
+              <p class="muted" style="font-size:12px">
+                * 이 카메라 화면은 브라우저에서만 표시됩니다. 업로드/전송 기능은 포함하지 않습니다.
+              </p>
+
+              <h2 style="margin-top:16px">아웃트로 영상(옵션)</h2>
+              <p class="muted">카메라 대신 영상으로 마무리하고 싶다면 아래를 사용하세요.</p>
+              <div class="media" style="margin-top:10px">
+                <video src="videos/outro_message.mp4" controls></video>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="camera-note reveal delay3">
-            <h2>메시지</h2>
-            <p>당신의 선택은 기록이 되었고, 그 시선은 결국 당신에게 돌아옵니다.</p>
-            <p class="muted" style="font-size:12px">
-              * 이 카메라 화면은 브라우저에서만 표시됩니다. 업로드/전송 기능은 포함하지 않습니다.
-            </p>
-
-            <h2 style="margin-top:16px">아웃트로 영상(옵션)</h2>
-            <p class="muted">카메라 대신 영상으로 마무리하고 싶다면 아래를 사용하세요.</p>
-            <div class="media" style="margin-top:10px">
-              <video src="videos/outro_message.mp4" controls></video>
-            </div>
+      <div class="outro-panel" id="s6b">
+        <div class="outro-video-stage">
+          <div class="outro-video-frame">
+            <div id="outroVideoPlayer"></div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- 7 -->
-    <section id="s7" data-title="전체 플로우 요약" data-sub="SUMMARY">
-      <div class="container">
-        <div class="kicker reveal">Summary</div>
-        <h1 class="reveal delay1">전시 전체 플로우 요약</h1>
-        <p class="lead reveal delay2">전시 경험을 한 번에 보여주는 요약 영상으로 마무리.</p>
-        <div class="card reveal delay3" style="margin-top:18px">
-          <div class="media"><video src="videos/summary.mp4" controls></video></div>
-        </div>
+    <section id="s7" data-title="설문 안내" data-sub="SURVEY">
+      <div class="survey-stage">
+        <a class="survey-link" href="#" target="_blank" rel="noopener noreferrer">
+          <strong>설문 참여하러 가기</strong>
+          <span>설문 링크</span>
+        </a>
       </div>
     </section>
   </main>
@@ -1431,7 +1523,7 @@
       s3: ["s3"],
       s4: ["s4", "s4a", "s4b"],
       s5: ["s5", "s5a", "s5b"],
-      s6: ["s6"],
+      s6: ["s6", "s6a", "s6b"],
       s7: ["s7"]
     };
 
@@ -1475,7 +1567,7 @@
     }, {threshold: 0.55});
     $$("section[data-title]").forEach(sec=>sectionIO.observe(sec));
 
-    const navTargetIds = ["s1a", "s2", "s3", "s4a", "s4b", "s5a", "s5b", "s6", "s7"];
+    const navTargetIds = ["s1a", "s2", "s3", "s4a", "s4b", "s5a", "s5b", "s6a", "s6b", "s7"];
     const navTargets = navTargetIds
       .map(id => document.getElementById(id))
       .filter(Boolean);
@@ -1618,10 +1710,18 @@
       const totalDelay = LOG_START_DELAY + LOG_INTRO_DURATION + AFTER_LOG_DURATION;
 
       setTimeout(()=>{
-        const nextSection = document.getElementById("s7");
-        if(nextSection){
-          nextSection.scrollIntoView({behavior:"smooth", block:"start"});
+        const nextPanel = document.getElementById("s6b");
+        if(nextPanel){
+          nextPanel.scrollIntoView({behavior:"smooth", block:"start"});
         }
+
+        setTimeout(()=>{
+          if(outroPlayer && youtubeAPIReady){
+            try{
+              outroPlayer.playVideo();
+            }catch(e){}
+          }
+        }, 700);
       }, totalDelay);
     }
 
@@ -1659,7 +1759,9 @@
     const gridEl     = $("#cctvGrid");
 
     const LOG_YOUTUBE_ID = "0FK4Wn0TtIc";
+    const OUTRO_YOUTUBE_ID = "8QkOtL35vRk";
     let logPlayer = null;
+    let outroPlayer = null;
     let youtubeAPIReady = false;
 
     // ---- Random CCTV video assignment ----
@@ -1691,23 +1793,30 @@
     function getNextBatch(){
       if(remainingMultiples.length < 1 || remainingCCTV.length < 3) return [];
 
-      const batch = [];
+      const batchSet = new Set();
 
       // exactly one unused multiple-of-4 per batch
       const special = remainingMultiples.shift();
       if(typeof special === "number"){
-        batch.push(special);
+        batchSet.add(special);
       }
 
-      while(batch.length < 4 && remainingCCTV.length > 0){
-        batch.push(remainingCCTV.shift());
+      while(batchSet.size < 4 && remainingCCTV.length > 0){
+        const candidate = remainingCCTV.shift();
+        if(typeof candidate === "number"){
+          batchSet.add(candidate);
+        }
       }
 
-      return shuffle(batch);
+      const batch = Array.from(batchSet);
+      return batch.length === 4 ? shuffle(batch) : [];
     }
 
     function applyBatch(batch){
-      currentBatch = batch.slice();
+      const uniqueBatch = Array.from(new Set(batch)).slice(0, 4);
+      if(uniqueBatch.length !== 4) return;
+
+      currentBatch = uniqueBatch;
       activeQuadrant = null;
       const quads = $$(".quad", gridEl);
 
@@ -1715,9 +1824,12 @@
         const num = currentBatch[i];
         const video = quad.querySelector("video");
 
-        quad.classList.remove("alert");
+        quad.classList.remove("alert", "selected", "switching");
         quad.dataset.clickable = "false";
+
+        video.pause();
         video.removeAttribute("src");
+        video.load();
 
         if(typeof num !== "number") return;
 
@@ -1908,6 +2020,7 @@
 
     function onYouTubeIframeAPIReady(){
       youtubeAPIReady = true;
+
       logPlayer = new YT.Player("logVideoPlayer", {
         videoId: LOG_YOUTUBE_ID,
         playerVars: {
@@ -1926,6 +2039,27 @@
             if(event.data === YT.PlayerState.ENDED){
               const outro = document.getElementById("s6");
               if(outro) outro.scrollIntoView({behavior:"smooth", block:"start"});
+            }
+          }
+        }
+      });
+
+      outroPlayer = new YT.Player("outroVideoPlayer", {
+        videoId: OUTRO_YOUTUBE_ID,
+        playerVars: {
+          autoplay: 0,
+          controls: 1,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1
+        },
+        events: {
+          onStateChange: (event) => {
+            if(event.data === YT.PlayerState.ENDED){
+              const nextSection = document.getElementById("s7");
+              if(nextSection){
+                nextSection.scrollIntoView({behavior:"smooth", block:"start"});
+              }
             }
           }
         }

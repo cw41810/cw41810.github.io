@@ -1577,6 +1577,25 @@
         showTitleOverlay(sec.getAttribute("data-title"), sec.getAttribute("data-sub"));
       });
     }, {threshold: 0.55});
+    const s3 = document.getElementById("s3");
+    let introPlayed = false;
+
+    const introIO = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting && !introPlayed){
+          introPlayed = true;
+
+          if(introPlayer && youtubeAPIReady){
+            try{
+              introPlayer.seekTo(0); // 처음부터
+              introPlayer.playVideo();
+            }catch(e){}
+          }
+        }
+      });
+    }, {threshold: 0.6});
+
+    if(s3) introIO.observe(s3);
     $$("section[data-title]").forEach(sec=>sectionIO.observe(sec));
     sectionIO.observe(document.getElementById("s6a"));
 
@@ -2042,7 +2061,7 @@
       introPlayer = new YT.Player("introVideoPlayer", {
         videoId: INTRO_YOUTUBE_ID,
         playerVars: {
-          autoplay: 1,
+          autoplay: 0,
           controls: 0,
           rel: 0,
           modestbranding: 1,
@@ -2052,7 +2071,6 @@
         events: {
           onReady: (event) => {
             event.target.mute();
-            event.target.playVideo();
           },
           onStateChange: (event) => {
             if(event.data === YT.PlayerState.ENDED){

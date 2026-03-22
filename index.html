@@ -1465,7 +1465,7 @@
                   <div>
                     <div style="font-size:18px; margin-bottom:6px; font-weight:600">카메라가 준비되지 않았습니다</div>
                     <div style="font-size:13px; color:rgba(246,247,251,.70); font-weight:400">
-                      상단 시작 모달에서 “허용하고 시작”을 눌러주세요.
+                      새로고침 후 ‘허용하고 시작’을 눌러주세요.
                     </div>
                   </div>
                 </div>
@@ -1514,6 +1514,7 @@
     </section>
   </main>
 
+  <audio id="bgmAudio" src="audio/bgm.mp3" preload="auto" loop></audio>
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     const $ = (sel, root=document) => root.querySelector(sel);
@@ -1608,6 +1609,7 @@
       entries.forEach(e=>{
         if(!e.isIntersecting) return;
         setActiveNav(e.target.id);
+        updateBgm(e.target.id);
       });
     }, {
       threshold: 0.2,
@@ -1647,16 +1649,78 @@
     function flash(){}
 
     // audio
-    const shutterAudio = new Audio("audio/shutter.mp3");
-    const beepAudio    = new Audio("audio/beep.mp3");
-    shutterAudio.preload = "auto";
-    beepAudio.preload = "auto";
+    const bgmAudio     = $("#bgmAudio");
+    const BGM_MAX_VOLUME = 0.35;
+    let bgmFadeRaf = null;
+    if(bgmAudio){
+      bgmAudio.volume = 0;
+    }
     function playSound(aud){
       try{
         aud.currentTime = 0;
         const p = aud.play();
         if(p && typeof p.catch === "function") p.catch(()=>{});
       }catch(e){}
+    }
+
+    function shouldPlayBgm(sectionId){
+      return ["s4a", "s4b", "s5a", "s5b", "s6a"].includes(sectionId);
+    }
+
+    function fadeBgmTo(targetVolume, duration = 700, shouldPauseAtEnd = false){
+      if(!bgmAudio) return;
+      if(bgmFadeRaf) cancelAnimationFrame(bgmFadeRaf);
+
+      const startVolume = Number.isFinite(bgmAudio.volume) ? bgmAudio.volume : 0;
+      const diff = targetVolume - startVolume;
+      const startTime = performance.now();
+
+      const step = (now) => {
+        const t = Math.min(1, (now - startTime) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        bgmAudio.volume = Math.max(0, Math.min(BGM_MAX_VOLUME, startVolume + diff * eased));
+
+        if(t < 1){
+          bgmFadeRaf = requestAnimationFrame(step);
+          return;
+        }
+
+        bgmFadeRaf = null;
+        bgmAudio.volume = Math.max(0, Math.min(BGM_MAX_VOLUME, targetVolume));
+        if(shouldPauseAtEnd && bgmAudio.volume <= 0.001){
+          bgmAudio.pause();
+        }
+      };
+
+      bgmFadeRaf = requestAnimationFrame(step);
+    }
+
+    function primeBgm(){
+      if(!bgmAudio) return;
+      bgmAudio.volume = 0;
+      const p = bgmAudio.play();
+      if(p && typeof p.then === "function"){
+        p.then(()=>{
+          bgmAudio.pause();
+          try{ bgmAudio.currentTime = 0; }catch(e){}
+          bgmAudio.volume = 0;
+        }).catch(()=>{});
+      }
+    }
+
+    function updateBgm(sectionId){
+      if(!bgmAudio) return;
+
+      if(shouldPlayBgm(sectionId)){
+        if(bgmAudio.paused){
+          bgmAudio.volume = 0;
+          const p = bgmAudio.play();
+          if(p && typeof p.catch === "function") p.catch(()=>{});
+        }
+        fadeBgmTo(BGM_MAX_VOLUME, 900, false);
+      } else {
+        fadeBgmTo(0, 1400, true);
+      }
     }
 
     // ---- Camera permission + stream ----
@@ -1756,17 +1820,21 @@
 
     allowCamBtn.addEventListener("click", async ()=>{
       // 사용자 제스처 안에서 요청해야 허용창이 뜸
+      primeBgm();
       const ok = await requestCamera();
       if(ok){
         cameraModal.classList.remove("on");
         showTitleOverlay("전시 시작", "BEGIN");
+        updateBgm("s1a");
       }
     });
 
     skipCamBtn.addEventListener("click", ()=>{
+      primeBgm();
       cameraModal.classList.remove("on");
       showTitleOverlay("전시 시작", "BEGIN");
       camOverlay.style.display = "flex";
+      updateBgm("s1a");
     });
 
     retryCamBtn.addEventListener("click", async ()=>{
@@ -1904,13 +1972,16 @@
       });
     }
 
-    function formatOverlayTime(offsetMs = 0){
-      const total = Math.max(0, offsetMs);
-      const hh = String(Math.floor(total / 3600000)).padStart(2, "0");
-      const mi = String(Math.floor((total % 3600000) / 60000)).padStart(2, "0");
-      const ss = String(Math.floor((total % 60000) / 1000)).padStart(2, "0");
-      const mss = String(Math.floor(total % 1000)).padStart(3, "0");
-      return `00-00-00 ${hh}:${mi}:${ss}.${mss}`;
+    function formatOverlayTime(ts = Date.now()){
+      const d = new Date(ts);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mi = String(d.getMinutes()).padStart(2, "0");
+      const ss = String(d.getSeconds()).padStart(2, "0");
+      const mss = String(d.getMilliseconds()).padStart(3, "0");
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}.${mss}`;
     }
 
     function cameraButtonLabel(q){
@@ -1920,25 +1991,20 @@
     function renderCameraLogOverlay(){
       if(!cameraLogOverlay) return;
 
+      const now = Date.now();
       const sourceLogs = logs.length
         ? [...logs].slice(0, 12)
         : [
-            {at: 0, quadrant:"TL"},
-            {at: 180, quadrant:"TR"},
-            {at: 420, quadrant:"BR"},
-            {at: 760, quadrant:"BL"},
-            {at: 1210, quadrant:"TL"},
-            {at: 1680, quadrant:"TR"}
+            {at: now - 1680, quadrant:"TL"},
+            {at: now - 1210, quadrant:"TR"},
+            {at: now - 760, quadrant:"BR"},
+            {at: now - 420, quadrant:"BL"},
+            {at: now - 180, quadrant:"TL"},
+            {at: now, quadrant:"TR"}
           ];
 
-      const originAt = typeof sourceLogs[sourceLogs.length - 1]?.at === "number"
-        ? sourceLogs[sourceLogs.length - 1].at
-        : 0;
-      const blueShiftDelay = 6000;
-
       const baseEntries = sourceLogs.map(item => {
-        const relativeOffset = Math.max(0, (item.at || 0) - originAt);
-        const timeText = formatOverlayTime(blueShiftDelay + relativeOffset);
+        const timeText = formatOverlayTime(item.at || Date.now());
         const buttonText = cameraButtonLabel(item.quadrant);
         return `${timeText}  ${buttonText} pressed`;
       });
@@ -2150,8 +2216,7 @@ gridEl.addEventListener("click", (e)=>{
       const q = quad.getAttribute("data-q");
       activeQuadrant = q;
 
-      playSound(shutterAudio);
-      playSound(beepAudio);
+      
       flash();
       triggerCameraSwitchEffect(q);
 
@@ -2202,7 +2267,8 @@ gridEl.addEventListener("click", (e)=>{
     render();
     renderCameraLogOverlay();
     initRandomCCTV();
-    setActiveNav("s1");
+    setActiveNav("s1a");
+    updateBgm("s1a");
 
     // UX: 모달 떠있는 동안 배경 스크롤을 막고 싶다면 여기서 main pointer-events 조절 가능
   </script>

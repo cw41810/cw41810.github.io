@@ -2066,11 +2066,11 @@
           rel: 0,
           modestbranding: 1,
           playsinline: 1,
-          mute: 1
+          mute: 0
         },
         events: {
           onReady: (event) => {
-            event.target.mute();
+            event.target.unMute();
           },
           onStateChange: (event) => {
             if(event.data === YT.PlayerState.ENDED){
@@ -2091,11 +2091,11 @@
           rel: 0,
           modestbranding: 1,
           playsinline: 1,
-          mute: 1
+          mute: 0
         },
         events: {
           onReady: (event) => {
-            event.target.mute();
+            event.target.unMute();
           },
           onStateChange: (event) => {
             if(event.data === YT.PlayerState.ENDED){

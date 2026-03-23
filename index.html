@@ -50,6 +50,7 @@
     main.scroll-locked{
       overflow-y:hidden;
       touch-action:none;
+      overscroll-behavior:none;
     }
     section{
       min-height:100vh;
@@ -1541,11 +1542,14 @@
     });
 
     let isScrollLocked = false;
+    let lockedScrollTop = 0;
 
     function lockScroll(){
       if(!scrollRoot) return;
+      lockedScrollTop = scrollRoot.scrollTop;
       isScrollLocked = true;
       scrollRoot.classList.add("scroll-locked");
+      scrollRoot.scrollTop = lockedScrollTop;
     }
 
     function unlockScroll(){
@@ -1561,6 +1565,16 @@
 
     window.addEventListener("wheel", preventLockedScroll, {passive:false});
     window.addEventListener("touchmove", preventLockedScroll, {passive:false});
+    if(scrollRoot){
+      scrollRoot.addEventListener("wheel", preventLockedScroll, {passive:false});
+      scrollRoot.addEventListener("touchmove", preventLockedScroll, {passive:false});
+      scrollRoot.addEventListener("scroll", ()=>{
+        if(!isScrollLocked) return;
+        if(scrollRoot.scrollTop !== lockedScrollTop){
+          scrollRoot.scrollTop = lockedScrollTop;
+        }
+      }, {passive:true});
+    }
     window.addEventListener("keydown", (e)=>{
       if(!isScrollLocked) return;
       const blocked = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];

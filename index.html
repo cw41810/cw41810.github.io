@@ -1525,6 +1525,15 @@
     // nav scroll
     $$("[data-go]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
+        if(!interactionComplete){
+          const current = document.elementFromPoint(window.innerWidth/2, window.innerHeight/2);
+          if(current){
+            const section = current.closest("section");
+            if(section && section.id === "s5"){
+              return;
+            }
+          }
+        }
         const id = btn.getAttribute("data-go");
         const el = document.getElementById(id);
         if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
@@ -1603,6 +1612,9 @@
         const sec = e.target;
         if(sec.id === "s6a"){
           startCameraSequence();
+        }
+        if(sec.id === "s5a" && !interactionComplete){
+          lockScroll();
         }
         showTitleOverlay(sec.getAttribute("data-title"), sec.getAttribute("data-sub"));
       });
@@ -2332,6 +2344,7 @@ gridEl.addEventListener("click", (e)=>{
       if(selectionCount >= TOTAL_SELECTIONS){
         completionTriggered = true;
         interactionComplete = true;
+        unlockScroll();
         forceComplete();
       } else {
         advanceCCTVBatch();

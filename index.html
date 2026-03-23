@@ -44,6 +44,12 @@
       overflow-y:auto;
       scroll-snap-type:y mandatory;
       scroll-behavior:smooth;
+      touch-action:pan-y;
+    }
+
+    main.scroll-locked{
+      overflow-y:hidden;
+      touch-action:none;
     }
     section{
       min-height:100vh;
@@ -1518,6 +1524,7 @@
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     const $ = (sel, root=document) => root.querySelector(sel);
+    const scrollRoot = $("#scrollRoot");
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
     // nav scroll
@@ -1528,6 +1535,33 @@
         if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
       });
     });
+
+    let isScrollLocked = false;
+
+    function lockScroll(){
+      if(!scrollRoot) return;
+      isScrollLocked = true;
+      scrollRoot.classList.add("scroll-locked");
+    }
+
+    function unlockScroll(){
+      if(!scrollRoot) return;
+      isScrollLocked = false;
+      scrollRoot.classList.remove("scroll-locked");
+    }
+
+    function preventLockedScroll(e){
+      if(!isScrollLocked) return;
+      e.preventDefault();
+    }
+
+    window.addEventListener("wheel", preventLockedScroll, {passive:false});
+    window.addEventListener("touchmove", preventLockedScroll, {passive:false});
+    window.addEventListener("keydown", (e)=>{
+      if(!isScrollLocked) return;
+      const blocked = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];
+      if(blocked.includes(e.key)) e.preventDefault();
+    }, {passive:false});
 
     const navButtons = $$('[data-go]');
     const navMap = {
@@ -1585,6 +1619,7 @@
       entries.forEach(e=>{
         if(e.isIntersecting && !introPlayed){
           introPlayed = true;
+          lockScroll();
 
           if(introPlayer && youtubeAPIReady){
             try{
@@ -1787,6 +1822,7 @@
 
       cameraSequenceStarted = true;
       cameraStartTime = Date.now();
+      lockScroll();
 
       // force reflow so animation always restarts cleanly
       s6Section.classList.remove("camera-sequence-start");
@@ -1803,14 +1839,17 @@
       const totalDelay = LOG_START_DELAY + LOG_INTRO_DURATION + AFTER_LOG_DURATION;
 
       setTimeout(()=>{
+        unlockScroll();
         const nextPanel = document.getElementById("s6b");
         if(nextPanel){
           nextPanel.scrollIntoView({behavior:"smooth", block:"start"});
         }
 
         setTimeout(()=>{
+          lockScroll();
           if(outroPlayer && youtubeAPIReady){
             try{
+              outroPlayer.seekTo(0);
               outroPlayer.playVideo();
             }catch(e){}
           }
@@ -2107,10 +2146,12 @@
     // completion overlay + force to outro + show camera
     function forceComplete(){
       setTimeout(()=>{
+        unlockScroll();
         const logPanel = document.getElementById("s5b");
         if(logPanel) logPanel.scrollIntoView({behavior:"smooth", block:"start"});
 
         setTimeout(()=>{
+          lockScroll();
           if(logPlayer && youtubeAPIReady){
             try{
               logPlayer.seekTo(0);
@@ -2140,6 +2181,7 @@
           },
           onStateChange: (event) => {
             if(event.data === YT.PlayerState.ENDED){
+              unlockScroll();
               const nextSection = document.getElementById("s4");
               if(nextSection){
                 nextSection.scrollIntoView({behavior:"smooth", block:"start"});
@@ -2165,6 +2207,7 @@
           },
           onStateChange: (event) => {
             if(event.data === YT.PlayerState.ENDED){
+              unlockScroll();
               const outro = document.getElementById("s6");
               if(outro) outro.scrollIntoView({behavior:"smooth", block:"start"});
             }
@@ -2184,6 +2227,7 @@
         events: {
           onStateChange: (event) => {
             if(event.data === YT.PlayerState.ENDED){
+              unlockScroll();
               const nextSection = document.getElementById("s7");
               if(nextSection){
                 nextSection.scrollIntoView({behavior:"smooth", block:"start"});

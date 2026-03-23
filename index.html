@@ -1909,10 +1909,10 @@
     const TOTAL_CCTV = 48;
     const TOTAL_SELECTIONS = 12;
 
-    let remainingCCTV = [];
-    let remainingMultiples = [];
+    let precomputedBatches = [];
     let currentBatch = [];
     let selectionCount = 0;
+    let usedVideoNumbers = new Set();
 
     function shuffle(arr){
       for(let i = arr.length - 1; i > 0; i--){
@@ -1924,40 +1924,50 @@
 
     function initCCTVPool(){
       const allNumbers = Array.from({length: TOTAL_CCTV}, (_, i) => i + 1);
-      remainingMultiples = shuffle(allNumbers.filter(n => n % 4 === 0));
-      remainingCCTV = shuffle(allNumbers.filter(n => n % 4 !== 0));
+      const multiples = shuffle(allNumbers.filter(n => n % 4 === 0));
+      const nonMultiples = shuffle(allNumbers.filter(n => n % 4 !== 0));
+
+      precomputedBatches = [];
+      usedVideoNumbers = new Set();
       currentBatch = [];
       selectionCount = 0;
       interactionComplete = false;
+
+      for(let i = 0; i < TOTAL_SELECTIONS; i++){
+        const special = multiples.shift();
+        const normals = nonMultiples.splice(0, 3);
+        if(typeof special !== "number" || normals.length !== 3) break;
+
+        const batch = shuffle([special, ...normals]);
+        precomputedBatches.push(batch);
+        batch.forEach(num => usedVideoNumbers.add(num));
+      }
+
+      // reset the used set for runtime checks; batches are already guaranteed unique
+      usedVideoNumbers = new Set();
     }
 
     function getNextBatch(){
-      if(remainingMultiples.length < 1 || remainingCCTV.length < 3) return [];
-
-      const batchSet = new Set();
-
-      // exactly one unused multiple-of-4 per batch
-      const special = remainingMultiples.shift();
-      if(typeof special === "number"){
-        batchSet.add(special);
-      }
-
-      while(batchSet.size < 4 && remainingCCTV.length > 0){
-        const candidate = remainingCCTV.shift();
-        if(typeof candidate === "number"){
-          batchSet.add(candidate);
-        }
-      }
-
-      const batch = Array.from(batchSet);
-      return batch.length === 4 ? shuffle(batch) : [];
+      if(precomputedBatches.length < 1) return [];
+      const batch = precomputedBatches.shift();
+      if(!Array.isArray(batch) || batch.length !== 4) return [];
+      return batch.slice();
     }
 
     function applyBatch(batch){
       const uniqueBatch = Array.from(new Set(batch)).slice(0, 4);
       if(uniqueBatch.length !== 4) return;
 
+      const multipleCount = uniqueBatch.filter(num => num % 4 === 0).length;
+      if(multipleCount !== 1) return;
+
+      // runtime guard: never reuse a number that has already been displayed
+      for(const num of uniqueBatch){
+        if(usedVideoNumbers.has(num)) return;
+      }
+
       currentBatch = uniqueBatch;
+      currentBatch.forEach(num => usedVideoNumbers.add(num));
       activeQuadrant = null;
       const quads = $$(".quad", gridEl);
 
@@ -2000,6 +2010,8 @@
       const nextBatch = getNextBatch();
       if(nextBatch.length === 4){
         applyBatch(nextBatch);
+      } else {
+        interactionComplete = true;
       }
     }
 
@@ -2219,7 +2231,7 @@
         videoId: OUTRO_YOUTUBE_ID,
         playerVars: {
           autoplay: 0,
-          controls: 1,
+          controls: 0,
           rel: 0,
           modestbranding: 1,
           playsinline: 1

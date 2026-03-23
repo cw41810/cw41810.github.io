@@ -1627,9 +1627,21 @@
         if(sec.id === "s6a"){
           startCameraSequence();
         }
-        if(sec.id === "s5a" && !interactionComplete){
-          lockScroll();
+
+        // ✅ 사분할 페이지 (s5a)
+        if(sec.id === "s5a"){
+          if(!interactionComplete){
+            lockScroll();     // 선택 끝나기 전 → 스크롤 막기
+          } else {
+            unlockScroll();   // 선택 끝나면 → 스크롤 허용
+          }
         }
+
+        // ✅ 규칙 페이지 (s4a, s4b)
+        if(sec.id === "s4a" || sec.id === "s4b"){
+          unlockScroll();     // 항상 스크롤 가능
+        }
+
         showTitleOverlay(sec.getAttribute("data-title"), sec.getAttribute("data-sub"));
       });
     }, {threshold: 0.55});
@@ -1681,6 +1693,9 @@
     if(posterMotionFrame) posterIO.observe(posterMotionFrame);
     $$("section[data-title]").forEach(sec=>sectionIO.observe(sec));
     sectionIO.observe(document.getElementById("s6a"));
+    sectionIO.observe(document.getElementById("s5a"));
+    sectionIO.observe(document.getElementById("s4a"));
+    sectionIO.observe(document.getElementById("s4b"));
 
     const navTargetIds = ["s1a", "s2", "s3", "s4a", "s4b", "s5a", "s5b", "s6a", "s6b", "s7"];
     const navTargets = navTargetIds

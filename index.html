@@ -1341,13 +1341,8 @@
         </div>
         <div class="poster-video-wrap">
           <div class="poster-video-inner">
-            <div class="poster-video-frame">
-              <iframe
-                src="https://www.youtube.com/embed/P0J5yCqBfPU?si=Uuykz2X8bHYXQBR1"
-                title="Poster Motion"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
+            <div class="poster-video-frame" id="posterMotionFrame">
+              <div id="posterVideoPlayer"></div>
             </div>
           </div>
         </div>
@@ -1613,6 +1608,7 @@
       });
     }, {threshold: 0.55});
     const s3 = document.getElementById("s3");
+    const posterMotionFrame = document.getElementById("posterMotionFrame");
     let introPlayed = false;
 
     const introIO = new IntersectionObserver((entries)=>{
@@ -1632,6 +1628,24 @@
     }, {threshold: 0.6});
 
     if(s3) introIO.observe(s3);
+    let posterPlayed = false;
+    const posterIO = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting && !posterPlayed){
+          posterPlayed = true;
+          lockScroll();
+
+          if(posterPlayer && youtubeAPIReady){
+            try{
+              posterPlayer.seekTo(0);
+              posterPlayer.playVideo();
+            }catch(e){}
+          }
+        }
+      });
+    }, {threshold: 0.7});
+
+    if(posterMotionFrame) posterIO.observe(posterMotionFrame);
     $$("section[data-title]").forEach(sec=>sectionIO.observe(sec));
     sectionIO.observe(document.getElementById("s6a"));
 
@@ -1897,9 +1911,11 @@
     const logVideoEl = null;
     const gridEl     = $("#cctvGrid");
 
+    const POSTER_YOUTUBE_ID = "P0J5yCqBfPU";
     const INTRO_YOUTUBE_ID = "BIxmL1K5cRQ";
     const LOG_YOUTUBE_ID = "0FK4Wn0TtIc";
     const OUTRO_YOUTUBE_ID = "8QkOtL35vRk";
+    let posterPlayer = null;
     let introPlayer = null;
     let logPlayer = null;
     let outroPlayer = null;
@@ -2176,6 +2192,28 @@
 
     function onYouTubeIframeAPIReady(){
       youtubeAPIReady = true;
+
+      posterPlayer = new YT.Player("posterVideoPlayer", {
+        videoId: POSTER_YOUTUBE_ID,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          mute: 0
+        },
+        events: {
+          onReady: (event) => {
+            event.target.unMute();
+          },
+          onStateChange: (event) => {
+            if(event.data === YT.PlayerState.ENDED){
+              unlockScroll();
+            }
+          }
+        }
+      });
 
       introPlayer = new YT.Player("introVideoPlayer", {
         videoId: INTRO_YOUTUBE_ID,

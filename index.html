@@ -1629,9 +1629,16 @@
 
     if(s3) introIO.observe(s3);
     let posterPlayed = false;
+    let posterPlayQueued = false;
     const posterIO = new IntersectionObserver((entries)=>{
       entries.forEach(e=>{
-        if(e.isIntersecting && !posterPlayed){
+        if(!e.isIntersecting || posterPlayed || posterPlayQueued) return;
+        if(e.intersectionRatio < 0.92) return;
+
+        posterPlayQueued = true;
+        posterMotionFrame.scrollIntoView({behavior:"smooth", block:"center"});
+
+        setTimeout(()=>{
           posterPlayed = true;
           lockScroll();
 
@@ -1641,9 +1648,9 @@
               posterPlayer.playVideo();
             }catch(e){}
           }
-        }
+        }, 420);
       });
-    }, {threshold: 0.7});
+    }, {threshold: [0.92]});
 
     if(posterMotionFrame) posterIO.observe(posterMotionFrame);
     $$("section[data-title]").forEach(sec=>sectionIO.observe(sec));

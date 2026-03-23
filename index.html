@@ -2217,6 +2217,10 @@
           onStateChange: (event) => {
             if(event.data === YT.PlayerState.ENDED){
               unlockScroll();
+              const nextSection = document.getElementById("s3");
+              if(nextSection){
+                nextSection.scrollIntoView({behavior:"smooth", block:"start"});
+              }
             }
           }
         }

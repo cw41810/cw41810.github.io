@@ -782,7 +782,7 @@
       font-weight:600;
       letter-spacing:-.6px;
     }
-    .modal .desc{margin:0 0 14px; color:rgba(246,247,251,.75)}
+    .modal .desc{margin:0 0 14px; color:rgba(246,247,251,.75); line-height:1.8}
     .modal .row{
       display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
       margin-top:12px;
@@ -1279,15 +1279,43 @@
   </div>
 
   <!-- Camera consent modal -->
-  <div class="modal on" id="cameraModal" aria-modal="true" role="dialog">
+  <div class="modal on" id="guideModal" aria-modal="true" role="dialog">
     <div class="panel">
-      <p class="title">카메라 사용을 허용하시겠습니까?</p>
+      <p class="title">소리를 켜고 감상해 주세요 🔊</p>
       <p class="desc">
-        카메라 영상은 <b>브라우저 안에서만</b> 표시되며, 이 페이지는 업로드/전송 기능을 포함하지 않습니다.
+        원활한 플레이를 위해 이어폰 착용을 권장합니다.
+      </p>
+      <p class="desc" style="margin-top:18px; padding-top:16px; border-top:1px solid rgba(255,255,255,.10); line-height:1.8">
+        본 페이지는 웹 환경에 최적화되어 있습니다.<br>안정적인 체험을 위해 <span style="font-weight:600">웹 환경에서의 참여를 권장</span>합니다.
       </p>
       <div class="row">
-        <button class="btn" id="skipCamBtn">지금은 건너뛰기</button>
+        <button class="btn btn-primary" id="openCameraModalBtn">확인하고 계속</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="cameraModal" aria-modal="true" role="dialog">
+    <div class="panel">
+      <p class="title">원활한 체험을 위해 카메라 권한이 필요합니다.</p>
+      <p class="desc" style="line-height:1.8">
+        카메라 영상은 <span style="font-weight:600">브라우저 안에서만</span> 표시되며, 업로드되거나 저장되지 않습니다.<br>
+        권한을 허용하지 않으면 일부 인터랙션에 정상적으로 참여하기 어렵습니다.
+      </p>
+      <div class="row">
         <button class="btn btn-primary" id="allowCamBtn">허용하고 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="cameraDeniedModal" aria-modal="true" role="dialog">
+    <div class="panel">
+      <p class="title">카메라 권한이 필요합니다.</p>
+      <p class="desc">
+        카메라 권한을 허용하지 않으면 일부 인터랙션에 정상적으로 참여하기 어렵습니다.<br>
+        아래 버튼을 눌러 다시 권한 허용을 진행해 주세요.
+      </p>
+      <div class="row">
+        <button class="btn btn-primary" id="retryPermissionBtn">다시 허용하기</button>
       </div>
     </div>
   </div>
@@ -1383,8 +1411,8 @@
       <div class="rules-detail-panel" id="s4b">
         <div class="rules-detail-inner">
           <div class="rules-copy reveal delay2">
-            <p>CCTV 화면을 모니터링하여 피사체의 사적 행동을 식별하십시오.</p>
-            <p>사적 행동이 확인되면 해당 화면을 즉시 선택하십시오.</p>
+            <p>CCTV 화면을 모니터링하여 사적 행동이 나타난 화면을 식별하십시오.</p>
+            <p>붉은색으로 표시된 화면이 선택 대상입니다.</p>
           </div>
 
           <div class="rules-images reveal delay3">
@@ -1396,7 +1424,7 @@
             </div>
           </div>
 
-          <p class="rules-caption reveal delay3">사적 행동 포착 시 화면은 붉은색으로 표시됩니다.</p>
+          <p class="rules-caption reveal delay3">사적 행동이 확인되면 해당 화면을 즉시 선택하십시오.</p>
         </div>
       </div>
     </section>
@@ -1470,9 +1498,10 @@
                   letter-spacing:-.3px;
                 ">
                   <div>
-                    <div style="font-size:18px; margin-bottom:6px; font-weight:600">카메라가 준비되지 않았습니다</div>
-                    <div style="font-size:13px; color:rgba(246,247,251,.70); font-weight:400">
-                      새로고침 후 ‘허용하고 시작’을 눌러주세요.
+                    <div style="font-size:18px; margin-bottom:6px; font-weight:600">카메라 권한이 필요합니다</div>
+                    <div style="font-size:13px; color:rgba(246,247,251,.70); font-weight:400; line-height:1.6">
+                      원활한 체험을 위해 카메라 권한을 허용해 주세요.<br>
+                      권한을 허용하지 않으면 일부 인터랙션에 정상적으로 참여하기 어렵습니다.
                     </div>
                   </div>
                 </div>
@@ -1800,15 +1829,25 @@
     }
 
     // ---- Camera permission + stream ----
+    const guideModal = $("#guideModal");
+    const openCameraModalBtn = $("#openCameraModalBtn");
     const cameraModal = $("#cameraModal");
+    const cameraDeniedModal = $("#cameraDeniedModal");
     const allowCamBtn = $("#allowCamBtn");
-    const skipCamBtn  = $("#skipCamBtn");
+    const retryPermissionBtn = $("#retryPermissionBtn");
+    const skipCamBtn  = null;
     const retryCamBtn = $("#retryCamBtn");
     const stopCamBtn  = $("#stopCamBtn");
     const userCamEl   = $("#userCam");
     const camOverlay  = $("#camOverlay");
     const cameraLogOverlay = $("#cameraLogOverlay");
     const s6Section = document.getElementById("s6");
+    if(openCameraModalBtn){
+      openCameraModalBtn.addEventListener("click", ()=>{
+        if(guideModal) guideModal.classList.remove("on");
+        if(cameraModal) cameraModal.classList.add("on");
+      });
+    }
 
     let camStream = null;
     let camReady = false;
@@ -1842,8 +1881,8 @@
         camReady = false;
         camOverlay.style.display = "flex";
         userCamEl.srcObject = null;
-        // 에러 메시지는 너무 기술적으로 노출하지 않고 안내만
-        showTitleOverlay("카메라 권한 필요", "PERMISSION");
+        if(cameraDeniedModal) cameraDeniedModal.classList.add("on");
+        showTitleOverlay("카메라 권한이 필요합니다", "PERMISSION REQUIRED");
         return false;
       }
     }
@@ -1904,18 +1943,24 @@
       const ok = await requestCamera();
       if(ok){
         cameraModal.classList.remove("on");
+        if(cameraDeniedModal) cameraDeniedModal.classList.remove("on");
         showTitleOverlay("전시 시작", "BEGIN");
         updateBgm("s1a");
       }
     });
 
-    skipCamBtn.addEventListener("click", ()=>{
-      primeBgm();
-      cameraModal.classList.remove("on");
-      showTitleOverlay("전시 시작", "BEGIN");
-      camOverlay.style.display = "flex";
-      updateBgm("s1a");
-    });
+
+    if(retryPermissionBtn){
+      retryPermissionBtn.addEventListener("click", async ()=>{
+        const ok = await requestCamera();
+        if(ok){
+          if(cameraDeniedModal) cameraDeniedModal.classList.remove("on");
+          if(cameraModal) cameraModal.classList.remove("on");
+          showTitleOverlay("전시 시작", "BEGIN");
+          updateBgm("s1a");
+        }
+      });
+    }
 
     retryCamBtn.addEventListener("click", async ()=>{
       await requestCamera();

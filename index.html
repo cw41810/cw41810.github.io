@@ -964,15 +964,30 @@
       animation: cameraBlueFade 10s linear forwards;
     }
 
-    #s6 video#userCam{
+    #s6 img#userCamImage{
+      position:absolute;
+      inset:0;
       width:100%;
       height:100%;
       object-fit:cover;
+      display:block;
+      z-index:0;
       filter:grayscale(1) saturate(0) contrast(1.04) brightness(.88);
     }
 
-    #s6.camera-sequence-start video#userCam{
+    #s6.camera-sequence-start img#userCamImage{
       animation: cameraColorShift 10s linear forwards;
+    }
+
+    #s6 video#userCam{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      opacity:0;
+      pointer-events:none;
+      z-index:0;
     }
 
     #s6 .media{
@@ -1482,6 +1497,7 @@
           <div class="camera-wrap">
             <div class="card reveal delay3">
               <div class="media">
+                <img id="userCamImage" src="images/people 2.png" alt="관람자 이미지">
                 <video id="userCam" autoplay playsinline muted></video>
                 <div class="camera-rec-badge"><span>REC</span><span class="camera-rec-dot"></span></div>
                 <div class="camera-log-overlay" id="cameraLogOverlay"></div>

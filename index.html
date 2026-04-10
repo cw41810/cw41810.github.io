@@ -1497,7 +1497,7 @@
           <div class="camera-wrap">
             <div class="card reveal delay3">
               <div class="media">
-                <img id="userCamImage" src="images/people 2.png" alt="관람자 이미지">
+                <img id="userCamImage" src="images/people_2.png" alt="관람자 이미지">
                 <video id="userCam" autoplay playsinline muted></video>
                 <div class="camera-rec-badge"><span>REC</span><span class="camera-rec-dot"></span></div>
                 <div class="camera-log-overlay" id="cameraLogOverlay"></div>
@@ -1594,22 +1594,17 @@
     let lockedScrollTop = 0;
 
     function lockScroll(){
-      if(!scrollRoot) return;
-      lockedScrollTop = scrollRoot.scrollTop;
-      isScrollLocked = true;
-      scrollRoot.classList.add("scroll-locked");
-      scrollRoot.scrollTop = lockedScrollTop;
+      // scroll lock disabled
+      isScrollLocked = false;
     }
 
     function unlockScroll(){
-      if(!scrollRoot) return;
+      // scroll lock disabled
       isScrollLocked = false;
-      scrollRoot.classList.remove("scroll-locked");
     }
 
     function preventLockedScroll(e){
-      if(!isScrollLocked) return;
-      e.preventDefault();
+      // do nothing (scroll always allowed)
     }
 
     window.addEventListener("wheel", preventLockedScroll, {passive:false});
@@ -1618,16 +1613,11 @@
       scrollRoot.addEventListener("wheel", preventLockedScroll, {passive:false});
       scrollRoot.addEventListener("touchmove", preventLockedScroll, {passive:false});
       scrollRoot.addEventListener("scroll", ()=>{
-        if(!isScrollLocked) return;
-        if(scrollRoot.scrollTop !== lockedScrollTop){
-          scrollRoot.scrollTop = lockedScrollTop;
-        }
+        // scroll lock disabled
       }, {passive:true});
     }
     window.addEventListener("keydown", (e)=>{
-      if(!isScrollLocked) return;
-      const blocked = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];
-      if(blocked.includes(e.key)) e.preventDefault();
+      // scroll lock disabled
     }, {passive:false});
 
     const navButtons = $$('[data-go]');
